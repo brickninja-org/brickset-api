@@ -72,7 +72,7 @@ jobs:
 
       - name: Setup git user
         run: |
-          git config --global user.email "160784075+brickset-release-bot[bot]@users.noreply.github.com"
+          git config --global user.email "982883+brickset-release-bot[bot]@users.noreply.github.com"
           git config --global user.name "brickninja-release-bot[bot]"
 
       - name: Create Release Pull Request
