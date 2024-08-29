@@ -1,0 +1,36 @@
+{
+  "name": "@brickset-api/types",
+  "version": "0.0.1",
+  "description": "TypeScript types for all datastructures used by the Brickset API",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brickninja-org/brickset-api-ts.git",
+    "directory": "packages/types"
+  },
+  "exports": {
+    "./endpoints": {
+      "types": "./endpoints.ts"
+    },
+    "./data/*": {
+      "types": "./data/*.ts"
+    }
+  },
+  "keywords": [
+    "brickset-api",
+    "types",
+    "brickset",
+    "api",
+    "typescript"
+  ],
+  "scripts": {
+    "test": "tsc",
+    "build": "tsc"
+  },
+  "devDependencies": {
+    "typescript": "5.5.4"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

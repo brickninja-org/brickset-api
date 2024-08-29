@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "outDir": "dist",
+    "declaration": true,
+    "moduleResolution": "bundler",
+    "module": "esnext",
+    "target": "ES2015"
+  },
+  "include": ["./src"],
+  "exclude": ["node_modules"]
+}
