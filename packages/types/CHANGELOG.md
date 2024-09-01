@@ -1,5 +1,11 @@
 # @brickset-api/types
 
+## 0.0.3
+
+### Patch Changes
+
+- b00b97a: Update package versions
+
 ## 0.0.2
 
 ### Minor Changes
