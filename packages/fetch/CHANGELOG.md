@@ -1,5 +1,16 @@
 # @brickset-api/fetch
 
+## 1.0.0
+
+### Minor Changes
+
+- 90196a0: Bump versions
+
+### Patch Changes
+
+- Updated dependencies [90196a0]
+  - @brickset-api/types@0.1.0
+
 ## 0.0.3
 
 ### Minor Changes
