@@ -1,6 +1,6 @@
 # @brickset-api/fetch
 
-## 1.0.0
+## 0.0.3
 
 ### Minor Changes
 
@@ -9,4 +9,4 @@
 ### Patch Changes
 
 - Updated dependencies [bcb884a]
-  - @brickset-api/types@0.1.0
+  - @brickset-api/types@0.0.2
