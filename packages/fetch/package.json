@@ -1,13 +1,13 @@
 {
   "name": "@brickset-api/fetch",
-  "version": "1.0.0",
+  "version": "0.0.3",
   "description": "Tiny wrapper around fetch that returns type-safe responses",
   "license": "MIT",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brickninja-org/brickset-api-ts.git",
+    "url": "git+https://github.com/brickninja-org/brickset-api.git",
     "directory": "packages/fetch"
   },
   "keywords": [
