@@ -1,5 +1,11 @@
 # @brickset-api/types
 
+## 0.0.9
+
+### Patch Changes
+
+- 92ab17b: Update types
+
 ## 0.0.8
 
 ### Patch Changes
