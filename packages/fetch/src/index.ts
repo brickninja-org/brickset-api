@@ -1,4 +1,4 @@
-import { AuthenticatedOptions, OptionsByEndpoint, type EndpointType } from '@brickset-api/types/endpoints';
+import { AuthenticatedOptions, ApiKeyOptions, OptionsByEndpoint, type EndpointType } from '@brickset-api/types/endpoints';
 
 type RequiredKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? never : K }[keyof T];
 
@@ -14,6 +14,16 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
   ...[endpoint, options]: Args<Url>
 ): Promise<EndpointType<Url>> {
   const url = new URL(endpoint, 'https://brickset.com/api/v3.asmx');
+
+  if (hasApiKey(options)) {
+    url.searchParams.set('apiKey', options.apiKey);
+  }
+
+  if (hasUserHash(options)) {
+    url.searchParams.set('userHash', options.userHash);
+  } else {
+    url.searchParams.set('userHash', '');
+  }
 
   // build request
   let request = new Request(url, {
@@ -41,8 +51,8 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
   const isJson = response.headers.get('content-type')?.startsWith('application/json');
 
   // censor access token in url to not leak it in error messages
-  const erroredUrl = hasAccessToken(options)
-    ? url.toString().replace(options.accessToken, '***')
+  const erroredUrl = hasUserHash(options)
+    ? url.toString().replace(options.userHash, '***')
     : url.toString();
 
   // check if the resonse is an error
@@ -73,6 +83,9 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
 }
 
 export type FetchBricksetApiOptions = {
+  /** The Brickset API key */
+  apiKey: string;
+
   /** onRequest handler allows to modify the request made to the Brickset API. */
   onRequest?: (request: Request) => Request | Promise<Request>;
 
@@ -98,6 +111,10 @@ export class BricksetApiError extends Error {
   }
 }
 
-function hasAccessToken(options: OptionsByEndpoint<any>): options is AuthenticatedOptions {
-  return 'accessToken' in options;
+function hasApiKey(options: OptionsByEndpoint<any>): options is ApiKeyOptions {
+  return 'apiKey' in options;
+}
+
+function hasUserHash(options: OptionsByEndpoint<any>): options is AuthenticatedOptions {
+  return 'userHash' in options;
 }

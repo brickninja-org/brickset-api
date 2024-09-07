@@ -1,4 +1,32 @@
-export type GetSets = GetSets_Base;
+export type GetSets = GetSets_Response;
+
+export type GetSetsOptions = {
+  setID?: number;
+  query?: {
+    setNumber?: string;
+    theme?: string;
+    subtheme?: string;
+  };
+  theme?: string | string[];
+  subtheme?: string | string[];
+  setNumber?: string | string[];
+  year?: number | number[];
+  tag?: string;
+  owned?: boolean;
+  wanted?: boolean;
+  updatedSince?: string;
+  orderBy?: string; // TODO: define possible values
+  pageSize?: number; // TODO: limit to 500
+  pageNumber?: number;
+  extendedData?: boolean;
+};
+
+interface GetSets_Response {
+  message?: string;
+  status: string;
+  matches?: number;
+  sets?: GetSets_Base[];
+}
 
 interface GetSets_Base {
   setID: number;
