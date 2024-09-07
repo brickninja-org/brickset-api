@@ -1,5 +1,11 @@
 # @brickset-api/fetch
 
+## 0.0.6
+
+### Patch Changes
+
+- d475626: Update types version
+
 ## 0.0.5
 
 ### Patch Changes
