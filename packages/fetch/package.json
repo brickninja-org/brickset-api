@@ -1,6 +1,6 @@
 {
   "name": "@brickset-api/fetch",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Tiny wrapper around fetch that returns type-safe responses",
   "license": "MIT",
   "main": "dist/index.js",
@@ -24,7 +24,7 @@
     "typescript": "5.5.4"
   },
   "peerDependencies": {
-    "@brickset-api/types": "~0.0.6"
+    "@brickset-api/types": "~0.0.7"
   },
   "publishConfig": {
     "access": "public"
