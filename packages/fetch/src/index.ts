@@ -17,6 +17,8 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
 
   if (hasApiKey(options)) {
     url.searchParams.set('apiKey', options.apiKey);
+  } else {
+    throw new Error('An API key is required to call the Brickset API');
   }
 
   if (hasUserHash(options)) {
