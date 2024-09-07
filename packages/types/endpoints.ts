@@ -36,7 +36,7 @@ export type OptionsByEndpoint<Endpoint extends string> =
 
 // result type for endpoint
 export type EndpointType<Url extends KnownEndpoint | (string & {})> =
-  Url extends '/v3.asmx/getSets' ? GetSets[] :
+  Url extends '/v3.asmx/getSets' ? GetSets :
   unknown;
 
 export type ValidateEndpointUrl<T extends string> = unknown extends EndpointType<T> ? 'unknown endpoint url' : T;
