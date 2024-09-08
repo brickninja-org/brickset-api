@@ -1,4 +1,4 @@
-import { AuthenticatedOptions, ApiKeyOptions, OptionsByEndpoint, type EndpointType } from '@brickset-api/types/endpoints';
+import { AuthenticatedOptions, ApiKeyOptions, OptionsByEndpoint, type EndpointType, ValidateEndpointUrl, KnownEndpoint } from '@brickset-api/types/endpoints';
 
 type RequiredKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? never : K }[keyof T];
 
@@ -8,14 +8,20 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
   : [endpoint: Url, options: FetchBricksetApiOptions & OptionsByEndpoint<Url> & FetchOptions]
 
 
+  /*
+  const test: ValidateEndpointUrl<'/api/v3.asmx/getSets?params="test"'>  = fetchBricksetApi('/api/v3.asmx/getSets?params="test"', {
+    apiKey: 'your-api-key',
+  });
+  */
+ 
   export async function fetchBricksetApi<
-  Url extends (string & {}),
+  Url extends KnownEndpoint | (string & {}),
 >(
   ...[endpoint, options]: Args<Url>
 ): Promise<EndpointType<Url>> {
-  const url = new URL(endpoint, 'https://brickset.com/api/v3.asmx');
+  const url = new URL(endpoint, 'https://brickset.com');
 
-  if (hasApiKey(options)) {
+  if (options.apiKey) {
     url.searchParams.set('apiKey', options.apiKey);
   } else {
     throw new Error('An API key is required to call the Brickset API');
@@ -29,6 +35,8 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
 
   // build request
   let request = new Request(url, {
+    redirect: 'manual',
+
     // set signal and cache from options
     signal: options.signal,
     cache: options.cache,
@@ -50,7 +58,7 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
   await options.onResponse?.(response);
 
   // check if the response is json (`application/json; charset=utf-8`)
-  const isJson = response.headers.get('content-type')?.startsWith('application/json');
+  const isJson = response.headers.get('content-type').startsWith('application/json');
 
   // censor access token in url to not leak it in error messages
   const erroredUrl = hasUserHash(options)
@@ -62,8 +70,8 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
     if (isJson) {
       const error: unknown = await response.json();
 
-      if (typeof error === 'object' && 'text' in error && typeof error.text === 'string') {
-        throw new BricksetApiError(`The Brickset API call to '${erroredUrl}' returned ${response.status} ${response.statusText}: ${error.text}.`, response);
+      if (typeof error === 'object' && 'message' in error && typeof error.message === 'string') {
+        throw new BricksetApiError(`The Brickset API call to '${erroredUrl}' returned ${response.status} ${response.statusText}: ${error.message}.`, response);
       }
     }
 
@@ -111,10 +119,6 @@ export class BricksetApiError extends Error {
     super(message);
     this.name = 'BricksetApiError';
   }
-}
-
-function hasApiKey(options: OptionsByEndpoint<any>): options is ApiKeyOptions {
-  return 'apiKey' in options;
 }
 
 function hasUserHash(options: OptionsByEndpoint<any>): options is AuthenticatedOptions {
