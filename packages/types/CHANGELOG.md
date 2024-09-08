@@ -1,5 +1,11 @@
 # @brickset-api/types
 
+## 0.0.10
+
+### Patch Changes
+
+- df6f3b5: Create new release
+
 ## 0.0.9
 
 ### Patch Changes

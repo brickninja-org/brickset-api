@@ -1,5 +1,13 @@
 # @brickset-api/fetch
 
+## 0.0.11
+
+### Patch Changes
+
+- df6f3b5: Create new release
+- Updated dependencies [df6f3b5]
+  - @brickset-api/types@0.0.10
+
 ## 0.0.10
 
 ### Patch Changes
