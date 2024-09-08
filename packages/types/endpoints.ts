@@ -4,7 +4,9 @@ export type KnownAuthenticatedEndpoint =
   | '/setCollection';
 
 export type KnownUnauthorizedEndpoint =
-  | '/getSets';
+  | '/api/v3.asmx/getSets'
+  | '/api/v3.asmx/getThemes'
+  | '/api/v3.asmx/getYears';
 
 export type KnownEndpoint = KnownAuthenticatedEndpoint | KnownUnauthorizedEndpoint;
 
@@ -14,16 +16,9 @@ type CombineParameters<P1 extends string, P2 extends string> = `${P1}&${P2}` | `
 type WithParameters<Url extends string, Parameters extends string | undefined> =
   Parameters extends undefined ? Url : `${Url}?${Parameters}`;
 
-// helper for paginated endpoints
-type PaginationParameters = `pageNumber=${number}` | CombineParameters<`pageNumber=${number}`, `pageSize=${number}`>;
-type PaginatedEndpointUrl<Endpoint extends KnownEndpoint> = Endpoint | WithParameters<Endpoint, PaginationParameters>;
-
 // helper for endpoints with parameters
 type ParamsParameter = `params=${string}`;
 type EndpointWithParams<Endpoint extends KnownEndpoint> = WithParameters<Endpoint, ParamsParameter>;
-
-type BulkExpandedManyEndpointUrl<Endpoint extends KnownEndpoint> = EndpointWithParams<Endpoint>;
-type BulkExpandedEndpointUrl<Endpoint extends KnownEndpoint> = BulkExpandedManyEndpointUrl<Endpoint> | Endpoint;
 
 // options
 type Options = {};
@@ -37,15 +32,19 @@ export type AuthenticatedOptions = ApiKeyOptions &{
 };
 
 export type OptionsByEndpoint<Endpoint extends string> =
-  Endpoint extends BulkExpandedEndpointUrl<KnownEndpoint & KnownUnauthorizedEndpoint> ? Options & ApiKeyOptions :
-  Endpoint extends KnownAuthenticatedEndpoint ? Options & AuthenticatedOptions :
-  Endpoint extends KnownUnauthorizedEndpoint ? Options & ApiKeyOptions :
-  Endpoint extends KnownEndpoint ? Options & ApiKeyOptions :
-  ApiKeyOptions & Partial<AuthenticatedOptions>;
+  Endpoint extends '/api/v3.asmx/getSets' ? Options & { params: string } & ApiKeyOptions :
+  Endpoint extends '/api/v3.asmx/getThemes' ? Options & ApiKeyOptions :
+  Endpoint extends '/api/v3.asmx/getYears' ? Options & { theme?: string } & ApiKeyOptions :
+  Partial<AuthenticatedOptions & ApiKeyOptions>;
+
+type ApiResponse<T> = {
+  status: string;
+  message?: string;
+} & T;
 
 // result type for endpoint
 export type EndpointType<Url extends KnownEndpoint | (string & {})> =
-  Url extends BulkExpandedEndpointUrl<'/getSets'> ? GetSets :
+  Url extends '/api/v3.asmx/getSets' ? ApiResponse<{ sets: GetSets }> :
   unknown;
 
 export type ValidateEndpointUrl<T extends string> = unknown extends EndpointType<T> ? 'unknown endpoint url' : T;

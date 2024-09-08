@@ -7,13 +7,6 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
   ? [endpoint: Url, options?: FetchBricksetApiOptions & OptionsByEndpoint<Url> & FetchOptions]
   : [endpoint: Url, options: FetchBricksetApiOptions & OptionsByEndpoint<Url> & FetchOptions]
 
-
-  /*
-  const test: ValidateEndpointUrl<'/api/v3.asmx/getSets?params="test"'>  = fetchBricksetApi('/api/v3.asmx/getSets?params="test"', {
-    apiKey: 'your-api-key',
-  });
-  */
- 
   export async function fetchBricksetApi<
   Url extends KnownEndpoint | (string & {}),
 >(
@@ -31,6 +24,10 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
     url.searchParams.set('userHash', options.userHash);
   } else {
     url.searchParams.set('userHash', '');
+  }
+
+  if ('params' in options) {
+    url.searchParams.set('params', JSON.stringify(options.params));
   }
 
   // build request
