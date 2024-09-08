@@ -1,5 +1,11 @@
 # @brickset-api/fetch
 
+## 0.0.10
+
+### Patch Changes
+
+- 4fba2c1: Update fetch function
+
 ## 0.0.9
 
 ### Patch Changes
