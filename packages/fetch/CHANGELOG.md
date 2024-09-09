@@ -1,5 +1,13 @@
 # @brickset-api/fetch
 
+## 0.0.13
+
+### Patch Changes
+
+- 4cb360a: Update deps
+- Updated dependencies [4cb360a]
+  - @brickset-api/types@0.0.13
+
 ## 0.0.12
 
 ### Patch Changes

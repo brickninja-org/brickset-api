@@ -1,5 +1,11 @@
 # @brickset-api/types
 
+## 0.0.13
+
+### Patch Changes
+
+- 4cb360a: Update deps
+
 ## 0.0.12
 
 ### Patch Changes
