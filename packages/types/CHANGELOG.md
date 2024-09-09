@@ -1,5 +1,11 @@
 # @brickset-api/types
 
+## 0.0.11
+
+### Patch Changes
+
+- f315e4d: Update endpoint types
+
 ## 0.0.10
 
 ### Patch Changes
