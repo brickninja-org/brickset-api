@@ -44,7 +44,7 @@ type ApiResponse<T> = {
 
 // result type for endpoint
 export type EndpointType<Url extends KnownEndpoint | (string & {})> =
-  Url extends '/api/v3.asmx/getSets' ? ApiResponse<{ sets: GetSets }> :
+  Url extends '/api/v3.asmx/getSets' ? { status: 'success' | 'error'; message?: string; sets: GetSets } :
   unknown;
 
 export type ValidateEndpointUrl<T extends string> = unknown extends EndpointType<T> ? 'unknown endpoint url' : T;

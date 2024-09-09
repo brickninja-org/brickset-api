@@ -1,6 +1,4 @@
-export type GetSets = GetSetsResponse;
-
-export type Item = ItemBase;
+export type GetSets = GetSetsBase;
 
 export type GetSetsOptions = {
   setID?: number;
@@ -23,14 +21,7 @@ export type GetSetsOptions = {
   extendedData?: boolean;
 };
 
-interface GetSetsResponse {
-  message?: string;
-  status: string;
-  matches?: number;
-  sets?: ItemBase[];
-}
-
-interface ItemBase {
+interface GetSetsBase {
   setID: number;
   number: string;
   numberVariant: string;
