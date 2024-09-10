@@ -1,5 +1,13 @@
 # @brickset-api/fetch
 
+## 0.0.14
+
+### Patch Changes
+
+- bc63adc: Update endpoints
+- Updated dependencies [bc63adc]
+  - @brickset-api/types@0.0.14
+
 ## 0.0.13
 
 ### Patch Changes
