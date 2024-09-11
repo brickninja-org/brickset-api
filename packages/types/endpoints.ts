@@ -25,14 +25,15 @@ export type ApiKeyOptions = {
   apiKey: string;
 };
 
-export type AuthenticatedOptions = ApiKeyOptions & {
+export type AuthenticatedOptions = {
   userHash: string;
 };
 
 export type OptionsByEndpoint<Endpoint extends string> =
   Endpoint extends UrlWithParams<'/api/v3.asmx/getSets'> ? Options & ApiKeyOptions :
-  Endpoint extends '/api/v3.asmx/getThemes' ? Options & ApiKeyOptions :
-  Partial<AuthenticatedOptions & ApiKeyOptions>;
+  Endpoint extends KnownAuthenticatedEndpoint ? Options & ApiKeyOptions & AuthenticatedOptions :
+  Endpoint extends KnownEndpoint ? Options & ApiKeyOptions :
+  Partial<ApiKeyOptions>;
 
 // Common Brickset API v3 response
 export type ApiResponse<T> = { status: 'success' } & T | { status: 'error'; message: string };

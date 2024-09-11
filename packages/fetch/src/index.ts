@@ -14,20 +14,14 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
 ): Promise<EndpointType<Url>> {
   const url = new URL(endpoint, 'https://brickset.com');
 
-  if (options.apiKey) {
+  if (hasApiKey(options)) {
     url.searchParams.set('apiKey', options.apiKey);
-  } else {
-    throw new Error('An API key is required to call the Brickset API');
   }
 
   if (hasUserHash(options)) {
     url.searchParams.set('userHash', options.userHash);
   } else {
     url.searchParams.set('userHash', '');
-  }
-
-  if ('params' in options) {
-    url.searchParams.set('params', JSON.stringify(options.params));
   }
 
   // build request
@@ -57,12 +51,12 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
   // check if the response is json (`application/json; charset=utf-8`)
   const isJson = response.headers.get('content-type').startsWith('application/json');
 
-  // censor access token in url to not leak it in error messages
-  const erroredUrl = hasUserHash(options)
+  // censor user hash in url to not leak it in error messages
+  const erroredUrl = hasUserHash(options) && options.userHash !== ''
     ? url.toString().replace(options.userHash, '***')
     : url.toString();
 
-  // check if the resonse is an error
+  // check if the response is an error
   if (!response.ok) {
     if (isJson) {
       const error: unknown = await response.json();
@@ -72,7 +66,7 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
       }
     }
 
-    // otherwise just throw error with the statu code
+    // otherwise just throw error with the status code
     throw new BricksetApiError(`The Brickset API call to '${erroredUrl}' returned ${response.status} ${response.statusText}.`, response);
   }
 
@@ -90,9 +84,6 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
 }
 
 export type FetchBricksetApiOptions = {
-  /** The Brickset API key */
-  apiKey: string;
-
   /** onRequest handler allows to modify the request made to the Brickset API. */
   onRequest?: (request: Request) => Request | Promise<Request>;
 
@@ -118,6 +109,10 @@ export class BricksetApiError extends Error {
   }
 }
 
-function hasUserHash(options: OptionsByEndpoint<any>): options is AuthenticatedOptions {
+function hasApiKey(options: OptionsByEndpoint<any>): options is ApiKeyOptions {
+  return 'apiKey' in options;
+}
+
+function hasUserHash(options: OptionsByEndpoint<any>): options is ApiKeyOptions & AuthenticatedOptions {
   return 'userHash' in options;
 }
