@@ -1,5 +1,11 @@
 # @brickset-api/fetch
 
+## 0.0.16
+
+### Patch Changes
+
+- b3fb55c: Update fetch
+
 ## 0.0.15
 
 ### Patch Changes
