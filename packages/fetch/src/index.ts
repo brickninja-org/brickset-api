@@ -49,7 +49,7 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
   await options.onResponse?.(response);
 
   // check if the response is json (`application/json; charset=utf-8`)
-  const isJson = response.headers.get('content-type').startsWith('application/json');
+  const isJson = true; // response.headers.get('content-type').startsWith('application/json');
 
   // censor user hash in url to not leak it in error messages
   const erroredUrl = hasUserHash(options) && options.userHash !== ''
