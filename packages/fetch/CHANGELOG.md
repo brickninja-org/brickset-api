@@ -1,5 +1,13 @@
 # @brickset-api/fetch
 
+## 0.0.15
+
+### Patch Changes
+
+- 2d77e7e: Update types
+- Updated dependencies [2d77e7e]
+  - @brickset-api/types@0.0.15
+
 ## 0.0.14
 
 ### Patch Changes
