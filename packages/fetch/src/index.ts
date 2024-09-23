@@ -55,6 +55,10 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
   const erroredUrl = hasUserHash(options) && options.userHash !== ''
     ? url.toString().replace(options.userHash, '***')
     : url.toString();
+  
+  if (hasApiKey(options)) {
+    erroredUrl.replace(options.apiKey, '***');
+  }
 
   // check if the response is an error
   if (!response.ok) {
@@ -77,6 +81,10 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
 
   // parse the JSON response
   const json = await response.json();
+
+  if (json.status === 'error') {
+    throw new BricksetApiError(`The Brickset API call to '${erroredUrl}' returned an error: ${json.message}`, response);
+  }
 
   // TODO: catch more errors
 
