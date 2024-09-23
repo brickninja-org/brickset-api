@@ -1,5 +1,11 @@
 # @brickset-api/fetch
 
+## 0.0.17
+
+### Patch Changes
+
+- b3811a8: Add more error checks
+
 ## 0.0.16
 
 ### Patch Changes
