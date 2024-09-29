@@ -1,5 +1,11 @@
 # @brickset-api/types
 
+## 0.0.16
+
+### Patch Changes
+
+- ed9db77: Update endpoints
+
 ## 0.0.15
 
 ### Patch Changes

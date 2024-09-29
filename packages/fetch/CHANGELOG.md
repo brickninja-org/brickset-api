@@ -1,5 +1,13 @@
 # @brickset-api/fetch
 
+## 0.0.18
+
+### Patch Changes
+
+- ed9db77: Update endpoints
+- Updated dependencies [ed9db77]
+  - @brickset-api/types@0.0.16
+
 ## 0.0.17
 
 ### Patch Changes
