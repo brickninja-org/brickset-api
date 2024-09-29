@@ -1,4 +1,5 @@
 import type { GetSets } from "./data/get-sets";
+import type { GetThemes } from "./data/get-themes";
 
 export type KnownAuthenticatedEndpoint =
   | '/setCollection';
@@ -43,7 +44,7 @@ export type ApiResponse<T> = { status: 'success' } & T | { status: 'error'; mess
 // result type for endpoint
 export type EndpointType<Url extends KnownEndpoint | (string & {})> =
   Url extends UrlWithParams<'/api/v3.asmx/getSets'> ? ApiResponse<{ matches: number; sets: GetSets[] }> :
-  Url extends '/api/v3.asmx/getThemes' ? ApiResponse<{ matches: number, themes: string[] }> :
+  Url extends '/api/v3.asmx/getThemes' ? ApiResponse<{ matches: number, themes: GetThemes[] }> :
   unknown;
 
 export type ValidateEndpointUrl<T extends string> = unknown extends EndpointType<T> ? 'unknown endpoint url' : T;
