@@ -24,7 +24,7 @@ export type GetSetsOptions = {
 interface GetSetsBase {
   setID: number;
   number: string;
-  numberVariant: string;
+  numberVariant: number;
   name: string;
   year: number;
   theme: string;
@@ -32,8 +32,8 @@ interface GetSetsBase {
   subtheme: string;
   category: string;
   released: boolean;
-  pieces: number;
-  minifigs: number;
+  pieces?: number;
+  minifigs?: number;
   image: Image;
   bricksetURL: string;
   collection: Collection;
@@ -46,13 +46,15 @@ interface GetSetsBase {
   };
   rating: number;
   reviewCount: number;
+  launchDate?: string;
+  exitDate?: string;
   packagingType: string;
   availability: string;
   instructionsCount: number;
   additionalImageCount: number;
   ageRange: AgeRange;
   dimensions: Dimensions;
-  barcodes: Barcodes;
+  barcode: Barcodes;
   extendedData: ExtendedData;
   lastUpdated: string;
 }
