@@ -1,5 +1,11 @@
 # @brickset-api/fetch
 
+## 0.0.19
+
+### Patch Changes
+
+- e9012c6: Update per deps
+
 ## 0.0.18
 
 ### Patch Changes
