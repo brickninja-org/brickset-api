@@ -1,7 +1,16 @@
+import type { ApiKeyUsage } from "./data/api-key-usage";
+import type { FlagLabel } from "./data/flag-label";
 import type { GetCollection } from "./data/get-collection";
 import type { GetSets } from "./data/get-sets";
 import type { GetSubthemes } from "./data/get-subthemes";
 import type { GetThemes } from "./data/get-themes";
+import type { Image } from "./data/image";
+import type { Instructions } from "./data/instructions";
+import type { MinifigCollection } from "./data/minifig-collection";
+import type { Reviews } from "./data/reviews";
+import type { UserMinifigNotes } from "./data/user-minifig-notes";
+import type { UserNotes } from "./data/user-notes";
+import type { Years } from "./data/years";
 
 export type KnownAuthenticatedEndpoint =
   | '/api/v3.asmx/checkUserHash'
@@ -103,22 +112,22 @@ export type ApiResponse<T> = { status: 'success' } & T | { status: 'error'; mess
 type LoginResponse = ApiResponse<{ hash: string }>;
 type CheckKeyResponse = ApiResponse<Record<string, never>>;
 type CheckUserHashResponse = ApiResponse<Record<string, never>>;
-type GetKeyUsageStatsResponse = ApiResponse<{ matches: number; apiKeyUsage: unknown[] }>;
-type GetAdditionalImagesResponse = ApiResponse<{ matches: number; additionalImages: unknown[] }>;
-type GetInstructionsResponse = ApiResponse<{ matches: number; instructions: unknown[] }>;
-type GetReviewsResponse = ApiResponse<{ matches: number; reviews: unknown[] }>;
+type GetKeyUsageStatsResponse = ApiResponse<{ matches: number; apiKeyUsage: ApiKeyUsage[] }>;
+type GetAdditionalImagesResponse = ApiResponse<{ matches: number; additionalImages: Image[] }>;
+type GetInstructionsResponse = ApiResponse<{ matches: number; instructions: Instructions[] }>;
+type GetReviewsResponse = ApiResponse<{ matches: number; reviews: Reviews[] }>;
 type SetCollectionResponse = ApiResponse<Record<string, never>>;
 type GetCollectionResponse = ApiResponse<{ matches: number; sets: GetCollection[] }>;
 type GetSetsResponse = ApiResponse<{ matches: number; sets: GetSets[] }>;
 type GetThemesResponse = ApiResponse<{ matches: number; themes: GetThemes[] }>;
 type GetSubthemesResponse = ApiResponse<{ matches: number; subthemes: GetSubthemes[] }>;
-type GetYearsResponse = ApiResponse<{ matches: number; years: unknown[] }>;
-type GetUserNotesResponse = ApiResponse<{ matches: number; userNotes: unknown[] }>;
-type GetUserFlagLabelsResponse = ApiResponse<{ matches: number; flags: unknown[] }>;
+type GetYearsResponse = ApiResponse<{ matches: number; years: Years[] }>;
+type GetUserNotesResponse = ApiResponse<{ matches: number; userNotes: UserNotes[] }>;
+type GetUserFlagLabelsResponse = ApiResponse<{ matches: number; flags: FlagLabel[] }>;
 type SetUserFlagLabelsResponse = ApiResponse<Record<string, never>>;
-type GetMinifigCollectionResponse = ApiResponse<{ matches: number; minifigs: unknown[] }>;
+type GetMinifigCollectionResponse = ApiResponse<{ matches: number; minifigs: MinifigCollection[] }>;
 type SetMinifigCollectionResponse = ApiResponse<Record<string, never>>;
-type GetUserMinifigNotesResponse = ApiResponse<{ matches: number; userMinifigNotes: unknown[] }>;
+type GetUserMinifigNotesResponse = ApiResponse<{ matches: number; userMinifigNotes: UserMinifigNotes[] }>;
 
 // Brickset API v3 
 
