@@ -1,5 +1,6 @@
 import type { GetCollection } from "./data/get-collection";
 import type { GetSets } from "./data/get-sets";
+import type { GetSubthemes } from "./data/get-subthemes";
 import type { GetThemes } from "./data/get-themes";
 
 export type KnownAuthenticatedEndpoint =
@@ -9,6 +10,7 @@ export type KnownAuthenticatedEndpoint =
 export type KnownUnauthorizedEndpoint =
   | '/api/v3.asmx/getSets'
   | '/api/v3.asmx/getThemes'
+  | '/api/v3.asmx/getSubthemes'
   | '/api/v3.asmx/login'
   | '/api/v3.asmx/checkUserHash';
 
@@ -66,6 +68,7 @@ type SetCollectionResponse = ApiResponse<Record<string, never>>;
 type GetCollectionResponse = ApiResponse<{ matches: number; sets: GetCollection[] }>;
 type GetSetsResponse = ApiResponse<{ matches: number; sets: GetSets[] }>;
 type GetThemesResponse = ApiResponse<{ matches: number; themes: GetThemes[] }>;
+type GetSubthemesResponse = ApiResponse<{ matches: number; subthemes: GetSubthemes[] }>;
 
 // Brickset API v3 
 
@@ -77,6 +80,7 @@ export type EndpointType<Url extends KnownEndpoint | (string & {})> =
   Url extends SetCollectionUrl ? SetCollectionResponse :
   Url extends GetSetsUrl ? GetSetsResponse :
   Url extends '/api/v3.asmx/getThemes' ? GetThemesResponse :
+  Url extends '/api/v3.asmx/getSubthemes' ? GetSubthemesResponse :
   unknown;
 
 export type ValidateEndpointUrl<T extends string> = unknown extends EndpointType<T> ? 'unknown endpoint url' : T;
