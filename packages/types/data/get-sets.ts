@@ -45,6 +45,7 @@ interface GetSetsBase {
     DE: LEGOComDetails;
   };
   rating: number;
+  ratingCount: number;
   reviewCount: number;
   launchDate?: string;
   exitDate?: string;
@@ -54,7 +55,9 @@ interface GetSetsBase {
   additionalImageCount: number;
   ageRange: AgeRange;
   dimensions: Dimensions;
+  modelDimensions: ModelDimensions;
   barcode: Barcodes;
+  itemNumber: ItemNumbers;
   extendedData: ExtendedData;
   lastUpdated: string;
 }
@@ -72,6 +75,12 @@ interface Dimensions {
   weight?: number;
 }
 
+interface ModelDimensions {
+  dimension1?: number;
+  dimension2?: number;
+  dimension3?: number;
+}
+
 interface ExtendedData {
   notes: string;
   tags: string[];
@@ -79,11 +88,17 @@ interface ExtendedData {
 }
 
 interface Collection {
+  setID?: number;
   owned?: boolean;
   wanted?: boolean;
   qtyOwned?: number;
+  qtyWanted?: number;
+  qtyOwnedNew?: number;
+  qtyOwnedUsed?: number;
+  wantedPriority?: number;
   rating?: number;
   notes: string;
+  flags?: Flag[];
 }
 
 interface Collections {
@@ -91,9 +106,19 @@ interface Collections {
   wantedBy?: number;
 }
 
+interface Flag {
+  flagNo: number;
+  value: boolean;
+}
+
 interface Barcodes {
   EAN: string;
   UPC: string;
+}
+
+interface ItemNumbers {
+  NA: string;
+  EU: string;
 }
 
 interface AgeRange {
