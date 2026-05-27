@@ -1,4 +1,10 @@
-import { AuthenticatedOptions, ApiKeyOptions, OptionsByEndpoint, type EndpointType, ValidateEndpointUrl, KnownEndpoint } from '@brickset-api/types/endpoints';
+import type {
+  AuthenticatedOptions,
+  ApiKeyOptions,
+  EndpointType,
+  KnownEndpoint,
+  OptionsByEndpoint,
+} from '@brickset-api/types/endpoints';
 
 type RequiredKeys<T> = { [K in keyof T]-?: {} extends Pick<T, K> ? never : K }[keyof T];
 
@@ -7,19 +13,20 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
   ? [endpoint: Url, options?: FetchBricksetApiOptions & OptionsByEndpoint<Url> & FetchOptions]
   : [endpoint: Url, options: FetchBricksetApiOptions & OptionsByEndpoint<Url> & FetchOptions]
 
-  export async function fetchBricksetApi<
+export async function fetchBricksetApi<
   Url extends KnownEndpoint | (string & {}),
 >(
   ...[endpoint, options]: Args<Url>
 ): Promise<EndpointType<Url>> {
+  const resolvedOptions = (options ?? {}) as FetchBricksetApiOptions & OptionsByEndpoint<Url> & FetchOptions;
   const url = new URL(endpoint, 'https://brickset.com');
 
-  if (hasApiKey(options)) {
-    url.searchParams.set('apiKey', options.apiKey);
+  if (hasApiKey(resolvedOptions)) {
+    url.searchParams.set('apiKey', resolvedOptions.apiKey);
   }
 
-  if (hasUserHash(options)) {
-    url.searchParams.set('userHash', options.userHash);
+  if (hasUserHash(resolvedOptions)) {
+    url.searchParams.set('userHash', resolvedOptions.userHash);
   } else {
     url.searchParams.set('userHash', '');
   }
@@ -29,13 +36,13 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
     redirect: 'manual',
 
     // set signal and cache from options
-    signal: options.signal,
-    cache: options.cache,
+    signal: resolvedOptions.signal,
+    cache: resolvedOptions.cache,
   });
 
   // if there is onRequest handler registered, let it modify the request
-  if (options.onRequest) {
-    request = await options.onRequest(request);
+  if (resolvedOptions.onRequest) {
+    request = await resolvedOptions.onRequest(request);
 
     if (!(request instanceof Request)) {
       throw new Error('onRequest handler must return a Request instance');
@@ -46,18 +53,18 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
   const response = await fetch(request);
 
   // call onResponse handler
-  await options.onResponse?.(response);
+  await resolvedOptions.onResponse?.(response);
 
   // check if the response is json (`application/json; charset=utf-8`)
   const isJson = true; // response.headers.get('content-type').startsWith('application/json');
 
   // censor user hash in url to not leak it in error messages
-  const erroredUrl = hasUserHash(options) && options.userHash !== ''
-    ? url.toString().replace(options.userHash, '***')
+  let erroredUrl = hasUserHash(resolvedOptions) && resolvedOptions.userHash !== ''
+    ? url.toString().replace(resolvedOptions.userHash, '***')
     : url.toString();
   
-  if (hasApiKey(options)) {
-    erroredUrl.replace(options.apiKey, '***');
+  if (hasApiKey(resolvedOptions)) {
+    erroredUrl = erroredUrl.replace(resolvedOptions.apiKey, '***');
   }
 
   // check if the response is an error
@@ -65,7 +72,12 @@ type Args<Url extends string> = RequiredKeys<OptionsByEndpoint<Url>> extends nev
     if (isJson) {
       const error: unknown = await response.json();
 
-      if (typeof error === 'object' && 'message' in error && typeof error.message === 'string') {
+      if (
+        typeof error === 'object' &&
+        error !== null &&
+        'message' in error &&
+        typeof error.message === 'string'
+      ) {
         throw new BricksetApiError(`The Brickset API call to '${erroredUrl}' returned ${response.status} ${response.statusText}: ${error.message}.`, response);
       }
     }
