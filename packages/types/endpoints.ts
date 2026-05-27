@@ -34,8 +34,7 @@ export type KnownUnauthorizedEndpoint =
   | '/api/v3.asmx/getThemes'
   | '/api/v3.asmx/getSubthemes'
   | '/api/v3.asmx/getYears'
-  | '/api/v3.asmx/login'
-  ;
+  | '/api/v3.asmx/login';
 
 export type KnownEndpoint = KnownAuthenticatedEndpoint | KnownUnauthorizedEndpoint;
 
@@ -119,6 +118,8 @@ export type SetUserFlagLabelsParams = Partial<Record<'1' | '2' | '3' | '4' | '5'
 
 // options
 type Options = {};
+type PublicOptions = Options & ApiKeyOptions;
+type UserOptions = PublicOptions & AuthenticatedOptions;
 
 export type ApiKeyOptions = {
   apiKey: string;
@@ -134,43 +135,44 @@ export type LoginOptions = {
 };
 
 export type OptionsByEndpoint<Endpoint extends string> =
-  Endpoint extends '/api/v3.asmx/login' ? Options & ApiKeyOptions & LoginOptions :
-  Endpoint extends KnownAuthenticatedEndpoint ? Options & ApiKeyOptions & AuthenticatedOptions :
-  Endpoint extends GetSetsUrl ? Options & ApiKeyOptions & { params: GetSetsOptions; userHash?: string } :
-  Endpoint extends SetCollectionUrl ? Options & ApiKeyOptions & AuthenticatedOptions & { setID: number; params: SetCollectionParams } :
-  Endpoint extends SetMinifigCollectionUrl ? Options & ApiKeyOptions & AuthenticatedOptions & { minifigNumber: string; params: SetMinifigCollectionParams } :
-  Endpoint extends GetMinifigCollectionUrl ? Options & ApiKeyOptions & AuthenticatedOptions & { params: GetMinifigCollectionParams } :
-  Endpoint extends SetUserFlagLabelsUrl ? Options & ApiKeyOptions & AuthenticatedOptions & { params: SetUserFlagLabelsParams } :
-  Endpoint extends SetIdEndpointsUrl ? Options & ApiKeyOptions & { setID: number } :
-  Endpoint extends SetNumberEndpointsUrl ? Options & ApiKeyOptions & { setNumber: string } :
-  Endpoint extends SubthemesEndpointUrl ? Options & ApiKeyOptions & { theme: string } :
-  Endpoint extends WithTheme<'/api/v3.asmx/getYears'> ? Options & ApiKeyOptions & { theme: string } :
-  Endpoint extends YearsEndpointUrl ? Options & ApiKeyOptions :
-  Endpoint extends KnownEndpoint ? Options & ApiKeyOptions :
+  Endpoint extends '/api/v3.asmx/login' ? PublicOptions & LoginOptions :
+  Endpoint extends KnownAuthenticatedEndpoint ? UserOptions :
+  Endpoint extends GetSetsUrl ? PublicOptions & { params: GetSetsOptions; userHash?: string } :
+  Endpoint extends SetCollectionUrl ? UserOptions & { setID: number; params: SetCollectionParams } :
+  Endpoint extends SetMinifigCollectionUrl ? UserOptions & { minifigNumber: string; params: SetMinifigCollectionParams } :
+  Endpoint extends GetMinifigCollectionUrl ? UserOptions & { params: GetMinifigCollectionParams } :
+  Endpoint extends SetUserFlagLabelsUrl ? UserOptions & { params: SetUserFlagLabelsParams } :
+  Endpoint extends SetIdEndpointsUrl ? PublicOptions & { setID: number } :
+  Endpoint extends SetNumberEndpointsUrl ? PublicOptions & { setNumber: string } :
+  Endpoint extends SubthemesEndpointUrl ? PublicOptions & { theme: string } :
+  Endpoint extends WithTheme<'/api/v3.asmx/getYears'> ? PublicOptions & { theme: string } :
+  Endpoint extends YearsEndpointUrl ? PublicOptions :
+  Endpoint extends KnownEndpoint ? PublicOptions :
   Partial<ApiKeyOptions>;
 
 // Common Brickset API v3 response
 export type ApiResponse<T> = { status: 'success' } & T | { status: 'error'; message: string };
+type MatchesListResponse<Key extends string, Item> = ApiResponse<{ matches: number } & Record<Key, Item[]>>;
 
 type LoginResponse = ApiResponse<{ hash: string }>;
 type CheckKeyResponse = ApiResponse<Record<string, never>>;
 type CheckUserHashResponse = ApiResponse<Record<string, never>>;
-type GetKeyUsageStatsResponse = ApiResponse<{ matches: number; apiKeyUsage: ApiKeyUsage[] }>;
-type GetAdditionalImagesResponse = ApiResponse<{ matches: number; additionalImages: Image[] }>;
-type GetInstructionsResponse = ApiResponse<{ matches: number; instructions: Instructions[] }>;
-type GetReviewsResponse = ApiResponse<{ matches: number; reviews: Reviews[] }>;
+type GetKeyUsageStatsResponse = MatchesListResponse<'apiKeyUsage', ApiKeyUsage>;
+type GetAdditionalImagesResponse = MatchesListResponse<'additionalImages', Image>;
+type GetInstructionsResponse = MatchesListResponse<'instructions', Instructions>;
+type GetReviewsResponse = MatchesListResponse<'reviews', Reviews>;
 type SetCollectionResponse = ApiResponse<Record<string, never>>;
-type GetCollectionResponse = ApiResponse<{ matches: number; sets: GetCollection[] }>;
-type GetSetsResponse = ApiResponse<{ matches: number; sets: GetSets[] }>;
-type GetThemesResponse = ApiResponse<{ matches: number; themes: GetThemes[] }>;
-type GetSubthemesResponse = ApiResponse<{ matches: number; subthemes: GetSubthemes[] }>;
-type GetYearsResponse = ApiResponse<{ matches: number; years: Years[] }>;
-type GetUserNotesResponse = ApiResponse<{ matches: number; userNotes: UserNotes[] }>;
-type GetUserFlagLabelsResponse = ApiResponse<{ matches: number; flags: FlagLabel[] }>;
+type GetCollectionResponse = MatchesListResponse<'sets', GetCollection>;
+type GetSetsResponse = MatchesListResponse<'sets', GetSets>;
+type GetThemesResponse = MatchesListResponse<'themes', GetThemes>;
+type GetSubthemesResponse = MatchesListResponse<'subthemes', GetSubthemes>;
+type GetYearsResponse = MatchesListResponse<'years', Years>;
+type GetUserNotesResponse = MatchesListResponse<'userNotes', UserNotes>;
+type GetUserFlagLabelsResponse = MatchesListResponse<'flags', FlagLabel>;
 type SetUserFlagLabelsResponse = ApiResponse<Record<string, never>>;
-type GetMinifigCollectionResponse = ApiResponse<{ matches: number; minifigs: MinifigCollection[] }>;
+type GetMinifigCollectionResponse = MatchesListResponse<'minifigs', MinifigCollection>;
 type SetMinifigCollectionResponse = ApiResponse<Record<string, never>>;
-type GetUserMinifigNotesResponse = ApiResponse<{ matches: number; userMinifigNotes: UserMinifigNotes[] }>;
+type GetUserMinifigNotesResponse = MatchesListResponse<'userMinifigNotes', UserMinifigNotes>;
 
 // Brickset API v3 
 
