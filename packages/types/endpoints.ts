@@ -49,6 +49,7 @@ type UrlWithParams<Url extends KnownEndpoint> =
   | WithParameters<Url, `params=${string}`>;
 
 type GetSetsUrl =
+  | '/api/v3.asmx/getSets'
   | UrlWithParams<'/api/v3.asmx/getSets'>;
 
 type ThemeQueryUrl<Url extends KnownEndpoint> =
@@ -178,10 +179,10 @@ export type EndpointType<Url extends KnownEndpoint | (string & {})> =
   Url extends '/api/v3.asmx/login' ? LoginResponse :
   Url extends '/api/v3.asmx/checkUserHash' ? CheckUserHashResponse :
   Url extends '/api/v3.asmx/getKeyUsageStats' ? GetKeyUsageStatsResponse :
-  Url extends SetIdQueryUrl<'/api/v3.asmx/getAdditionalImages'> ? GetAdditionalImagesResponse :
-  Url extends SetIdQueryUrl<'/api/v3.asmx/getInstructions'> ? GetInstructionsResponse :
-  Url extends SetNumberQueryUrl<'/api/v3.asmx/getInstructions2'> ? GetInstructionsResponse :
-  Url extends SetIdQueryUrl<'/api/v3.asmx/getReviews'> ? GetReviewsResponse :
+  Url extends SetIdQueryUrl<'/api/v3.asmx/getAdditionalImages'> | '/api/v3.asmx/getAdditionalImages' ? GetAdditionalImagesResponse :
+  Url extends SetIdQueryUrl<'/api/v3.asmx/getInstructions'> | '/api/v3.asmx/getInstructions' ? GetInstructionsResponse :
+  Url extends SetNumberQueryUrl<'/api/v3.asmx/getInstructions2'> | '/api/v3.asmx/getInstructions2' ? GetInstructionsResponse :
+  Url extends SetIdQueryUrl<'/api/v3.asmx/getReviews'> | '/api/v3.asmx/getReviews' ? GetReviewsResponse :
   Url extends '/api/v3.asmx/getCollection' ? GetCollectionResponse :
   Url extends SetCollectionUrl ? SetCollectionResponse :
   Url extends '/api/v3.asmx/getUserNotes' ? GetUserNotesResponse :
@@ -192,7 +193,7 @@ export type EndpointType<Url extends KnownEndpoint | (string & {})> =
   Url extends '/api/v3.asmx/getUserMinifigNotes' ? GetUserMinifigNotesResponse :
   Url extends GetSetsUrl ? GetSetsResponse :
   Url extends '/api/v3.asmx/getThemes' ? GetThemesResponse :
-  Url extends ThemeQueryUrl<'/api/v3.asmx/getSubthemes'> ? GetSubthemesResponse :
+  Url extends ThemeQueryUrl<'/api/v3.asmx/getSubthemes'> | '/api/v3.asmx/getSubthemes' ? GetSubthemesResponse :
   Url extends '/api/v3.asmx/getYears' ? GetYearsResponse :
   Url extends ThemeQueryUrl<'/api/v3.asmx/getYears'> ? GetYearsResponse :
   unknown;

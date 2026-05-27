@@ -1,5 +1,32 @@
 export type GetSets = GetSetsBase;
 
+type OrderByBase =
+  | 'Number'
+  | 'YearFrom'
+  | 'Pieces'
+  | 'Minifigs'
+  | 'Rating'
+  | 'UKRetailPrice'
+  | 'USRetailPrice'
+  | 'CARetailPrice'
+  | 'DERetailPrice'
+  | 'UKPricePerPiece'
+  | 'USPricePerPiece'
+  | 'CAPricePerPiece'
+  | 'DEPricePerPiece'
+  | 'Theme'
+  | 'Subtheme'
+  | 'Name'
+  | 'Random'
+  | 'QtyOwned'
+  | 'OwnCount'
+  | 'WantCount'
+  | 'UserRating'
+  | 'CollectionID'
+  | 'Rank';
+
+export type GetSetsOrderBy = OrderByBase | `${OrderByBase}DESC`;
+
 export type GetSetsOptions = {
   setID?: number;
   query?: {
@@ -15,8 +42,8 @@ export type GetSetsOptions = {
   owned?: boolean;
   wanted?: boolean;
   updatedSince?: string;
-  orderBy?: string; // TODO: define possible values
-  pageSize?: number; // TODO: limit to 500
+  orderBy?: GetSetsOrderBy;
+  pageSize?: number;
   pageNumber?: number;
   extendedData?: boolean;
 };
