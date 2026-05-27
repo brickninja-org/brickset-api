@@ -1,7 +1,7 @@
 import type { ApiKeyUsage } from "./data/api-key-usage";
 import type { FlagLabel } from "./data/flag-label";
 import type { GetCollection } from "./data/get-collection";
-import type { GetSets } from "./data/get-sets";
+import type { GetSets, GetSetsOptions } from "./data/get-sets";
 import type { GetSubthemes } from "./data/get-subthemes";
 import type { GetThemes } from "./data/get-themes";
 import type { Image } from "./data/image";
@@ -61,16 +61,57 @@ type SetNumberQueryUrl<Url extends KnownEndpoint> =
   | WithParameters<Url, `setNumber=${string}`>;
 
 type SetCollectionUrl =
+  | '/api/v3.asmx/setCollection'
   | WithParameters<'/api/v3.asmx/setCollection', CombineParameters<`setID=${string}`, `params=${string}`>>;
 
 type SetMinifigCollectionUrl =
+  | '/api/v3.asmx/setMinifigCollection'
   | WithParameters<'/api/v3.asmx/setMinifigCollection', CombineParameters<`minifigNumber=${string}`, `params=${string}`>>;
 
 type GetMinifigCollectionUrl =
+  | '/api/v3.asmx/getMinifigCollection'
   | UrlWithParams<'/api/v3.asmx/getMinifigCollection'>;
 
 type SetUserFlagLabelsUrl =
+  | '/api/v3.asmx/setUserFlagLabels'
   | UrlWithParams<'/api/v3.asmx/setUserFlagLabels'>;
+
+type OneOrZero = 0 | 1 | '0' | '1';
+
+export type SetCollectionParams = {
+  own?: OneOrZero;
+  want?: OneOrZero;
+  qtyOwned?: number;
+  qtyWanted?: number;
+  qtyOwnedNew?: number;
+  qtyOwnedUsed?: number;
+  wantedPriority?: number;
+  notes?: string;
+  rating?: 1 | 2 | 3 | 4 | 5;
+  flag1?: OneOrZero;
+  flag2?: OneOrZero;
+  flag3?: OneOrZero;
+  flag4?: OneOrZero;
+  flag5?: OneOrZero;
+  flag6?: OneOrZero;
+  flag7?: OneOrZero;
+  flag8?: OneOrZero;
+};
+
+export type GetMinifigCollectionParams = {
+  owned?: OneOrZero;
+  wanted?: OneOrZero;
+  query?: string;
+};
+
+export type SetMinifigCollectionParams = {
+  own?: OneOrZero;
+  want?: OneOrZero;
+  qtyOwned?: number;
+  notes?: string;
+};
+
+export type SetUserFlagLabelsParams = Partial<Record<'1' | '2' | '3' | '4' | '5' | '6' | '7' | '8', string>>;
 
 // options
 type Options = {};
@@ -91,17 +132,17 @@ export type LoginOptions = {
 export type OptionsByEndpoint<Endpoint extends string> =
   Endpoint extends '/api/v3.asmx/login' ? Options & ApiKeyOptions & LoginOptions :
   Endpoint extends KnownAuthenticatedEndpoint ? Options & ApiKeyOptions & AuthenticatedOptions :
-  Endpoint extends GetSetsUrl ? Options & ApiKeyOptions :
-  Endpoint extends SetCollectionUrl ? Options & ApiKeyOptions & AuthenticatedOptions :
-  Endpoint extends SetMinifigCollectionUrl ? Options & ApiKeyOptions & AuthenticatedOptions :
-  Endpoint extends GetMinifigCollectionUrl ? Options & ApiKeyOptions & AuthenticatedOptions :
-  Endpoint extends SetUserFlagLabelsUrl ? Options & ApiKeyOptions & AuthenticatedOptions :
-  Endpoint extends SetIdQueryUrl<'/api/v3.asmx/getAdditionalImages'> ? Options & ApiKeyOptions :
-  Endpoint extends SetIdQueryUrl<'/api/v3.asmx/getInstructions'> ? Options & ApiKeyOptions :
-  Endpoint extends SetIdQueryUrl<'/api/v3.asmx/getReviews'> ? Options & ApiKeyOptions :
-  Endpoint extends SetNumberQueryUrl<'/api/v3.asmx/getInstructions2'> ? Options & ApiKeyOptions :
-  Endpoint extends ThemeQueryUrl<'/api/v3.asmx/getSubthemes'> ? Options & ApiKeyOptions :
-  Endpoint extends ThemeQueryUrl<'/api/v3.asmx/getYears'> ? Options & ApiKeyOptions :
+  Endpoint extends GetSetsUrl ? Options & ApiKeyOptions & { params: GetSetsOptions; userHash?: string } :
+  Endpoint extends SetCollectionUrl ? Options & ApiKeyOptions & AuthenticatedOptions & { setID: number; params: SetCollectionParams } :
+  Endpoint extends SetMinifigCollectionUrl ? Options & ApiKeyOptions & AuthenticatedOptions & { minifigNumber: string; params: SetMinifigCollectionParams } :
+  Endpoint extends GetMinifigCollectionUrl ? Options & ApiKeyOptions & AuthenticatedOptions & { params: GetMinifigCollectionParams } :
+  Endpoint extends SetUserFlagLabelsUrl ? Options & ApiKeyOptions & AuthenticatedOptions & { params: SetUserFlagLabelsParams } :
+  Endpoint extends SetIdQueryUrl<'/api/v3.asmx/getAdditionalImages'> | '/api/v3.asmx/getAdditionalImages' ? Options & ApiKeyOptions & { setID: number } :
+  Endpoint extends SetIdQueryUrl<'/api/v3.asmx/getInstructions'> | '/api/v3.asmx/getInstructions' ? Options & ApiKeyOptions & { setID: number } :
+  Endpoint extends SetIdQueryUrl<'/api/v3.asmx/getReviews'> | '/api/v3.asmx/getReviews' ? Options & ApiKeyOptions & { setID: number } :
+  Endpoint extends SetNumberQueryUrl<'/api/v3.asmx/getInstructions2'> | '/api/v3.asmx/getInstructions2' ? Options & ApiKeyOptions & { setNumber: string } :
+  Endpoint extends ThemeQueryUrl<'/api/v3.asmx/getSubthemes'> | '/api/v3.asmx/getSubthemes' ? Options & ApiKeyOptions & { theme: string } :
+  Endpoint extends ThemeQueryUrl<'/api/v3.asmx/getYears'> ? Options & ApiKeyOptions & { theme: string } :
   Endpoint extends '/api/v3.asmx/getYears' ? Options & ApiKeyOptions :
   Endpoint extends KnownEndpoint ? Options & ApiKeyOptions :
   Partial<ApiKeyOptions>;

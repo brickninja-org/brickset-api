@@ -29,6 +29,29 @@ export async function fetchBricksetApi<
     url.searchParams.set('userHash', resolvedOptions.userHash);
   }
 
+  if ('setID' in resolvedOptions && resolvedOptions.setID !== undefined) {
+    url.searchParams.set('setID', String(resolvedOptions.setID));
+  }
+
+  if ('setNumber' in resolvedOptions && typeof resolvedOptions.setNumber === 'string') {
+    url.searchParams.set('setNumber', resolvedOptions.setNumber);
+  }
+
+  if ('minifigNumber' in resolvedOptions && typeof resolvedOptions.minifigNumber === 'string') {
+    url.searchParams.set('minifigNumber', resolvedOptions.minifigNumber);
+  }
+
+  if ('theme' in resolvedOptions && typeof resolvedOptions.theme === 'string') {
+    url.searchParams.set('theme', resolvedOptions.theme);
+  }
+
+  if ('params' in resolvedOptions && resolvedOptions.params !== undefined) {
+    const paramsValue = typeof resolvedOptions.params === 'string'
+      ? resolvedOptions.params
+      : JSON.stringify(resolvedOptions.params);
+    url.searchParams.set('params', paramsValue);
+  }
+
   // build request
   let request = new Request(url, {
     redirect: 'manual',
