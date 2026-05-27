@@ -18,17 +18,21 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [ 18, 20, 22 ]
+        node-version: [ 22, 24 ]
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 10
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v5
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm test
+        cache: 'pnpm'
+    - run: pnpm install --frozen-lockfile
+    - run: pnpm test
 
   success:
     name: Success
@@ -56,19 +60,24 @@ jobs:
           private-key: ${{ secrets.BRICKSET_RELEASE_APP_PRIVATE_KEY }}
 
       - name: Checkout Repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           token: ${{ steps.generate-token.outputs.token }}
 
       - name: Setup Node.js 22
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
-          cache: 'npm'
+          cache: 'pnpm'
           registry-url: 'https://registry.npmjs.org'
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
       - name: Install Dependencies
-        run: npm ci
+        run: pnpm install --frozen-lockfile
 
       - name: Setup git user
         run: |
@@ -84,5 +93,5 @@ jobs:
         with:
           title: New Release
           commit: Create new release
-          publish: npm run release
+          publish: pnpm release
           setupGitUser: false
