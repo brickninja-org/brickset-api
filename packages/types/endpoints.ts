@@ -48,9 +48,11 @@ type WithParameters<Url extends string, Parameters extends string | undefined = 
 type UrlWithParams<Url extends KnownEndpoint> =
   | WithParameters<Url, `params=${string}`>;
 
-type GetSetsUrl =
-  | '/api/v3.asmx/getSets'
-  | UrlWithParams<'/api/v3.asmx/getSets'>;
+type WithSingleQueryParam<Url extends KnownEndpoint, ParamName extends string> =
+  Url | WithParameters<Url, `${ParamName}=${string}`>;
+
+type WithDoubleQueryParams<Url extends KnownEndpoint, P1 extends string, P2 extends string> =
+  Url | WithParameters<Url, CombineParameters<`${P1}=${string}`, `${P2}=${string}`>>;
 
 type ThemeQueryUrl<Url extends KnownEndpoint> =
   | WithParameters<Url, `theme=${string}`>;
@@ -61,13 +63,13 @@ type SetIdQueryUrl<Url extends KnownEndpoint> =
 type SetNumberQueryUrl<Url extends KnownEndpoint> =
   | WithParameters<Url, `setNumber=${string}`>;
 
-type SetCollectionUrl =
-  | '/api/v3.asmx/setCollection'
-  | WithParameters<'/api/v3.asmx/setCollection', CombineParameters<`setID=${string}`, `params=${string}`>>;
+type GetSetsUrl =
+  | '/api/v3.asmx/getSets'
+  | UrlWithParams<'/api/v3.asmx/getSets'>;
 
-type SetMinifigCollectionUrl =
-  | '/api/v3.asmx/setMinifigCollection'
-  | WithParameters<'/api/v3.asmx/setMinifigCollection', CombineParameters<`minifigNumber=${string}`, `params=${string}`>>;
+type SetCollectionUrl = WithDoubleQueryParams<'/api/v3.asmx/setCollection', 'setID', 'params'>;
+
+type SetMinifigCollectionUrl = WithDoubleQueryParams<'/api/v3.asmx/setMinifigCollection', 'minifigNumber', 'params'>;
 
 type GetMinifigCollectionUrl =
   | '/api/v3.asmx/getMinifigCollection'
@@ -76,6 +78,13 @@ type GetMinifigCollectionUrl =
 type SetUserFlagLabelsUrl =
   | '/api/v3.asmx/setUserFlagLabels'
   | UrlWithParams<'/api/v3.asmx/setUserFlagLabels'>;
+
+type SetIdEndpoints = '/api/v3.asmx/getAdditionalImages' | '/api/v3.asmx/getInstructions' | '/api/v3.asmx/getReviews';
+type SetIdEndpointsUrl = WithSingleQueryParam<SetIdEndpoints, 'setID'>;
+
+type SetNumberEndpointsUrl = WithSingleQueryParam<'/api/v3.asmx/getInstructions2', 'setNumber'>;
+type SubthemesEndpointUrl = WithSingleQueryParam<'/api/v3.asmx/getSubthemes', 'theme'>;
+type YearsEndpointUrl = '/api/v3.asmx/getYears' | ThemeQueryUrl<'/api/v3.asmx/getYears'>;
 
 type OneOrZero = 0 | 1 | '0' | '1';
 
@@ -138,13 +147,11 @@ export type OptionsByEndpoint<Endpoint extends string> =
   Endpoint extends SetMinifigCollectionUrl ? Options & ApiKeyOptions & AuthenticatedOptions & { minifigNumber: string; params: SetMinifigCollectionParams } :
   Endpoint extends GetMinifigCollectionUrl ? Options & ApiKeyOptions & AuthenticatedOptions & { params: GetMinifigCollectionParams } :
   Endpoint extends SetUserFlagLabelsUrl ? Options & ApiKeyOptions & AuthenticatedOptions & { params: SetUserFlagLabelsParams } :
-  Endpoint extends SetIdQueryUrl<'/api/v3.asmx/getAdditionalImages'> | '/api/v3.asmx/getAdditionalImages' ? Options & ApiKeyOptions & { setID: number } :
-  Endpoint extends SetIdQueryUrl<'/api/v3.asmx/getInstructions'> | '/api/v3.asmx/getInstructions' ? Options & ApiKeyOptions & { setID: number } :
-  Endpoint extends SetIdQueryUrl<'/api/v3.asmx/getReviews'> | '/api/v3.asmx/getReviews' ? Options & ApiKeyOptions & { setID: number } :
-  Endpoint extends SetNumberQueryUrl<'/api/v3.asmx/getInstructions2'> | '/api/v3.asmx/getInstructions2' ? Options & ApiKeyOptions & { setNumber: string } :
-  Endpoint extends ThemeQueryUrl<'/api/v3.asmx/getSubthemes'> | '/api/v3.asmx/getSubthemes' ? Options & ApiKeyOptions & { theme: string } :
+  Endpoint extends SetIdEndpointsUrl ? Options & ApiKeyOptions & { setID: number } :
+  Endpoint extends SetNumberEndpointsUrl ? Options & ApiKeyOptions & { setNumber: string } :
+  Endpoint extends SubthemesEndpointUrl ? Options & ApiKeyOptions & { theme: string } :
   Endpoint extends ThemeQueryUrl<'/api/v3.asmx/getYears'> ? Options & ApiKeyOptions & { theme: string } :
-  Endpoint extends '/api/v3.asmx/getYears' ? Options & ApiKeyOptions :
+  Endpoint extends YearsEndpointUrl ? Options & ApiKeyOptions :
   Endpoint extends KnownEndpoint ? Options & ApiKeyOptions :
   Partial<ApiKeyOptions>;
 
@@ -179,10 +186,10 @@ export type EndpointType<Url extends KnownEndpoint | (string & {})> =
   Url extends '/api/v3.asmx/login' ? LoginResponse :
   Url extends '/api/v3.asmx/checkUserHash' ? CheckUserHashResponse :
   Url extends '/api/v3.asmx/getKeyUsageStats' ? GetKeyUsageStatsResponse :
-  Url extends SetIdQueryUrl<'/api/v3.asmx/getAdditionalImages'> | '/api/v3.asmx/getAdditionalImages' ? GetAdditionalImagesResponse :
-  Url extends SetIdQueryUrl<'/api/v3.asmx/getInstructions'> | '/api/v3.asmx/getInstructions' ? GetInstructionsResponse :
-  Url extends SetNumberQueryUrl<'/api/v3.asmx/getInstructions2'> | '/api/v3.asmx/getInstructions2' ? GetInstructionsResponse :
-  Url extends SetIdQueryUrl<'/api/v3.asmx/getReviews'> | '/api/v3.asmx/getReviews' ? GetReviewsResponse :
+  Url extends WithSingleQueryParam<'/api/v3.asmx/getAdditionalImages', 'setID'> ? GetAdditionalImagesResponse :
+  Url extends WithSingleQueryParam<'/api/v3.asmx/getInstructions', 'setID'> ? GetInstructionsResponse :
+  Url extends SetNumberEndpointsUrl ? GetInstructionsResponse :
+  Url extends WithSingleQueryParam<'/api/v3.asmx/getReviews', 'setID'> ? GetReviewsResponse :
   Url extends '/api/v3.asmx/getCollection' ? GetCollectionResponse :
   Url extends SetCollectionUrl ? SetCollectionResponse :
   Url extends '/api/v3.asmx/getUserNotes' ? GetUserNotesResponse :
@@ -193,9 +200,8 @@ export type EndpointType<Url extends KnownEndpoint | (string & {})> =
   Url extends '/api/v3.asmx/getUserMinifigNotes' ? GetUserMinifigNotesResponse :
   Url extends GetSetsUrl ? GetSetsResponse :
   Url extends '/api/v3.asmx/getThemes' ? GetThemesResponse :
-  Url extends ThemeQueryUrl<'/api/v3.asmx/getSubthemes'> | '/api/v3.asmx/getSubthemes' ? GetSubthemesResponse :
-  Url extends '/api/v3.asmx/getYears' ? GetYearsResponse :
-  Url extends ThemeQueryUrl<'/api/v3.asmx/getYears'> ? GetYearsResponse :
+  Url extends SubthemesEndpointUrl ? GetSubthemesResponse :
+  Url extends YearsEndpointUrl ? GetYearsResponse :
   unknown;
 
 export type ValidateEndpointUrl<T extends string> = unknown extends EndpointType<T> ? 'unknown endpoint url' : T;
