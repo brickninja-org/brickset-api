@@ -1,5 +1,13 @@
 # @brickset-api/fetch
 
+## 0.0.20
+
+### Patch Changes
+
+- 9d3d46f: Standardize pnpm workspace scripts, improve TypeScript 6 compatibility, and harden fetch error handling.
+- Updated dependencies [9d3d46f]
+  - @brickset-api/types@0.0.18
+
 ## 0.0.19
 
 ### Patch Changes
