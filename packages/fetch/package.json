@@ -18,7 +18,8 @@
   ],
   "scripts": {
     "test": "tsc --noEmit",
-    "build": "tsc"
+    "build": "tsc",
+    "test:integration": "pnpm build && node scripts/verify-query-serialization.mjs"
   },
   "devDependencies": {
     "@brickset-api/types": "workspace:*",
