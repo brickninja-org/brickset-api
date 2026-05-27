@@ -45,46 +45,40 @@ type CombineParameters<P1 extends string, P2 extends string> = `${P1}&${P2}` | `
 type WithParameters<Url extends string, Parameters extends string | undefined = undefined> =
   Parameters extends undefined ? Url : `${Url}?${Parameters}`;
 
-type UrlWithParams<Url extends KnownEndpoint> =
-  | WithParameters<Url, `params=${string}`>;
-
-type WithSingleQueryParam<Url extends KnownEndpoint, ParamName extends string> =
+type WithQueryParam<Url extends KnownEndpoint, ParamName extends string> =
   Url | WithParameters<Url, `${ParamName}=${string}`>;
 
-type WithDoubleQueryParams<Url extends KnownEndpoint, P1 extends string, P2 extends string> =
+type WithTwoQueryParams<Url extends KnownEndpoint, P1 extends string, P2 extends string> =
   Url | WithParameters<Url, CombineParameters<`${P1}=${string}`, `${P2}=${string}`>>;
 
-type ThemeQueryUrl<Url extends KnownEndpoint> =
-  | WithParameters<Url, `theme=${string}`>;
+type WithParamsJson<Url extends KnownEndpoint> = WithQueryParam<Url, 'params'>;
 
-type SetIdQueryUrl<Url extends KnownEndpoint> =
-  | WithParameters<Url, `setID=${string}`>;
+type WithTheme<Url extends KnownEndpoint> = WithQueryParam<Url, 'theme'>;
 
-type SetNumberQueryUrl<Url extends KnownEndpoint> =
-  | WithParameters<Url, `setNumber=${string}`>;
+type WithSetId<Url extends KnownEndpoint> = WithQueryParam<Url, 'setID'>;
 
 type GetSetsUrl =
   | '/api/v3.asmx/getSets'
-  | UrlWithParams<'/api/v3.asmx/getSets'>;
+  | WithParamsJson<'/api/v3.asmx/getSets'>;
 
-type SetCollectionUrl = WithDoubleQueryParams<'/api/v3.asmx/setCollection', 'setID', 'params'>;
+type SetCollectionUrl = WithTwoQueryParams<'/api/v3.asmx/setCollection', 'setID', 'params'>;
 
-type SetMinifigCollectionUrl = WithDoubleQueryParams<'/api/v3.asmx/setMinifigCollection', 'minifigNumber', 'params'>;
+type SetMinifigCollectionUrl = WithTwoQueryParams<'/api/v3.asmx/setMinifigCollection', 'minifigNumber', 'params'>;
 
 type GetMinifigCollectionUrl =
   | '/api/v3.asmx/getMinifigCollection'
-  | UrlWithParams<'/api/v3.asmx/getMinifigCollection'>;
+  | WithParamsJson<'/api/v3.asmx/getMinifigCollection'>;
 
 type SetUserFlagLabelsUrl =
   | '/api/v3.asmx/setUserFlagLabels'
-  | UrlWithParams<'/api/v3.asmx/setUserFlagLabels'>;
+  | WithParamsJson<'/api/v3.asmx/setUserFlagLabels'>;
 
 type SetIdEndpoints = '/api/v3.asmx/getAdditionalImages' | '/api/v3.asmx/getInstructions' | '/api/v3.asmx/getReviews';
-type SetIdEndpointsUrl = WithSingleQueryParam<SetIdEndpoints, 'setID'>;
+type SetIdEndpointsUrl = WithSetId<SetIdEndpoints>;
 
-type SetNumberEndpointsUrl = WithSingleQueryParam<'/api/v3.asmx/getInstructions2', 'setNumber'>;
-type SubthemesEndpointUrl = WithSingleQueryParam<'/api/v3.asmx/getSubthemes', 'theme'>;
-type YearsEndpointUrl = '/api/v3.asmx/getYears' | ThemeQueryUrl<'/api/v3.asmx/getYears'>;
+type SetNumberEndpointsUrl = WithQueryParam<'/api/v3.asmx/getInstructions2', 'setNumber'>;
+type SubthemesEndpointUrl = WithTheme<'/api/v3.asmx/getSubthemes'>;
+type YearsEndpointUrl = '/api/v3.asmx/getYears' | WithTheme<'/api/v3.asmx/getYears'>;
 
 type OneOrZero = 0 | 1 | '0' | '1';
 
@@ -150,7 +144,7 @@ export type OptionsByEndpoint<Endpoint extends string> =
   Endpoint extends SetIdEndpointsUrl ? Options & ApiKeyOptions & { setID: number } :
   Endpoint extends SetNumberEndpointsUrl ? Options & ApiKeyOptions & { setNumber: string } :
   Endpoint extends SubthemesEndpointUrl ? Options & ApiKeyOptions & { theme: string } :
-  Endpoint extends ThemeQueryUrl<'/api/v3.asmx/getYears'> ? Options & ApiKeyOptions & { theme: string } :
+  Endpoint extends WithTheme<'/api/v3.asmx/getYears'> ? Options & ApiKeyOptions & { theme: string } :
   Endpoint extends YearsEndpointUrl ? Options & ApiKeyOptions :
   Endpoint extends KnownEndpoint ? Options & ApiKeyOptions :
   Partial<ApiKeyOptions>;
@@ -186,10 +180,10 @@ export type EndpointType<Url extends KnownEndpoint | (string & {})> =
   Url extends '/api/v3.asmx/login' ? LoginResponse :
   Url extends '/api/v3.asmx/checkUserHash' ? CheckUserHashResponse :
   Url extends '/api/v3.asmx/getKeyUsageStats' ? GetKeyUsageStatsResponse :
-  Url extends WithSingleQueryParam<'/api/v3.asmx/getAdditionalImages', 'setID'> ? GetAdditionalImagesResponse :
-  Url extends WithSingleQueryParam<'/api/v3.asmx/getInstructions', 'setID'> ? GetInstructionsResponse :
+  Url extends WithSetId<'/api/v3.asmx/getAdditionalImages'> ? GetAdditionalImagesResponse :
+  Url extends WithSetId<'/api/v3.asmx/getInstructions'> ? GetInstructionsResponse :
   Url extends SetNumberEndpointsUrl ? GetInstructionsResponse :
-  Url extends WithSingleQueryParam<'/api/v3.asmx/getReviews', 'setID'> ? GetReviewsResponse :
+  Url extends WithSetId<'/api/v3.asmx/getReviews'> ? GetReviewsResponse :
   Url extends '/api/v3.asmx/getCollection' ? GetCollectionResponse :
   Url extends SetCollectionUrl ? SetCollectionResponse :
   Url extends '/api/v3.asmx/getUserNotes' ? GetUserNotesResponse :
