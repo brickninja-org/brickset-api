@@ -72,3 +72,21 @@ const client = new BricksetApiClient({
   middlewares: [createRateLimitMiddleware(250)],
 });
 ```
+
+Reliability helpers:
+
+```ts
+import {
+  BricksetApiClient,
+  createRetryMiddleware,
+  createTimeoutMiddleware,
+} from '@brickset-api/client';
+
+const client = new BricksetApiClient({
+  auth: { apiKey: '...' },
+  middlewares: [
+    createTimeoutMiddleware(5_000),
+    createRetryMiddleware({ retries: 2, baseDelayMs: 250 }),
+  ],
+});
+```

@@ -3,10 +3,12 @@ const assert = (condition, message) => {
 };
 
 const calls = [];
+const retryCallsByPath = new Map();
 globalThis.fetch = async (request) => {
   const req = request instanceof Request ? request : new Request(request);
   const url = new URL(req.url);
   calls.push(url);
+  retryCallsByPath.set(url.pathname, (retryCallsByPath.get(url.pathname) ?? 0) + 1);
 
   if (url.pathname.endsWith('/getThemes')) {
     return new Response(JSON.stringify({ status: 'success', matches: 1, themes: [{ theme: 'Test', setCount: 1, subthemeCount: 0, yearFrom: 2020, yearTo: 2020 }] }), {
@@ -50,13 +52,52 @@ globalThis.fetch = async (request) => {
     });
   }
 
+  if (url.pathname.endsWith('/getYears') && url.searchParams.get('theme') === 'retry') {
+    const count = retryCallsByPath.get(url.pathname) ?? 1;
+    if (count === 1) {
+      return new Response(JSON.stringify({ status: 'error', message: 'temporary failure' }), {
+        status: 503,
+        headers: { 'content-type': 'application/json' },
+      });
+    }
+    return new Response(JSON.stringify({ status: 'success', matches: 1, years: [{ year: 2024, setCount: 1 }] }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
+  if (url.pathname.endsWith('/getSubthemes') && url.searchParams.get('theme') === 'slow') {
+    await new Promise((resolve, reject) => {
+      const timer = setTimeout(resolve, 50);
+      const onAbort = () => {
+        clearTimeout(timer);
+        reject(new DOMException('Aborted', 'AbortError'));
+      };
+      if (req.signal.aborted) {
+        onAbort();
+        return;
+      }
+      req.signal.addEventListener('abort', onAbort, { once: true });
+    });
+    return new Response(JSON.stringify({ status: 'success', matches: 1, subthemes: [{ subtheme: 'Slow' }] }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
   return new Response(JSON.stringify({ status: 'success' }), {
     status: 200,
     headers: { 'content-type': 'application/json' },
   });
 };
 
-const { BricksetApiClient, InMemoryBricksetClientCache, BricksetClientError } = await import('../dist/index.js');
+const {
+  BricksetApiClient,
+  InMemoryBricksetClientCache,
+  BricksetClientError,
+  createRetryMiddleware,
+  createTimeoutMiddleware,
+} = await import('../dist/index.js');
 
 let middlewareHits = 0;
 const client = new BricksetApiClient({
@@ -89,4 +130,24 @@ try {
 assert(sawSanitized, 'Expected sanitized BricksetClientError for failed setCollection');
 
 assert(middlewareHits >= 2, 'Expected middleware to run for uncached requests');
+
+const retryClient = new BricksetApiClient({
+  auth: { apiKey: 'k' },
+  middlewares: [createRetryMiddleware({ retries: 1, baseDelayMs: 1 })],
+});
+const retried = await retryClient.getYears('retry');
+assert(retried.status === 'success', 'Retry middleware should recover from transient 5xx errors');
+
+const timeoutClient = new BricksetApiClient({
+  auth: { apiKey: 'k' },
+  middlewares: [createTimeoutMiddleware(10)],
+});
+let timeoutSanitized = false;
+try {
+  await timeoutClient.getSubthemes('slow');
+} catch (error) {
+  timeoutSanitized = error instanceof BricksetClientError;
+}
+assert(timeoutSanitized, 'Timeout middleware should trigger a sanitized BricksetClientError');
+
 console.log('client behavior integration check passed');

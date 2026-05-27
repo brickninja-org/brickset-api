@@ -75,6 +75,62 @@ export function createRateLimitMiddleware(minIntervalMs: number): BricksetClient
   };
 }
 
+export type RetryMiddlewareOptions = {
+  retries: number;
+  baseDelayMs?: number;
+  maxDelayMs?: number;
+  shouldRetry?: (error: unknown, attemptNumber: number) => boolean;
+};
+
+export function createRetryMiddleware(options: RetryMiddlewareOptions): BricksetClientMiddleware {
+  const retries = Math.max(0, Math.trunc(options.retries));
+  const baseDelayMs = options.baseDelayMs ?? 250;
+  const maxDelayMs = options.maxDelayMs ?? 2_000;
+  const shouldRetry = options.shouldRetry ?? defaultShouldRetry;
+
+  return async (request, next) => {
+    let attempt = 0;
+
+    for (;;) {
+      try {
+        return await next(request);
+      } catch (error) {
+        if (attempt >= retries || !shouldRetry(error, attempt + 1)) {
+          throw error;
+        }
+        const delayMs = Math.min(maxDelayMs, baseDelayMs * (2 ** attempt));
+        await sleep(delayMs);
+        attempt += 1;
+      }
+    }
+  };
+}
+
+export function createTimeoutMiddleware(timeoutMs: number): BricksetClientMiddleware {
+  if (!Number.isFinite(timeoutMs) || timeoutMs <= 0) {
+    throw new Error('timeoutMs must be a positive finite number.');
+  }
+
+  return async (request, next) => {
+    const timeoutController = new AbortController();
+    const timer = setTimeout(() => timeoutController.abort(), timeoutMs);
+    const combinedSignal = mergeAbortSignals(request.options.signal, timeoutController.signal);
+    const nextRequest = {
+      ...request,
+      options: {
+        ...request.options,
+        signal: combinedSignal,
+      },
+    } as BricksetClientRequest<typeof request.endpoint>;
+
+    try {
+      return await next(nextRequest);
+    } finally {
+      clearTimeout(timer);
+    }
+  };
+}
+
 export class BricksetApiClient {
   private readonly auth?: BricksetClientOptions['auth'];
   private readonly sanitizeErrors: boolean;
@@ -422,6 +478,31 @@ const NEVER_CACHE_ENDPOINTS = new Set([
 
 function defaultCanCache<Url extends KnownEndpoint | (string & {})>(request: BricksetClientRequest<Url>): boolean {
   return !NEVER_CACHE_ENDPOINTS.has(String(request.endpoint));
+}
+
+function defaultShouldRetry(error: unknown): boolean {
+  if (error instanceof BricksetApiError) {
+    const status = error.response.status;
+    return status === 429 || status >= 500;
+  }
+  return error instanceof TypeError;
+}
+
+function mergeAbortSignals(signalA: AbortSignal | undefined, signalB: AbortSignal): AbortSignal {
+  if (!signalA) {
+    return signalB;
+  }
+  if (signalA.aborted) {
+    return signalA;
+  }
+  if (signalB.aborted) {
+    return signalB;
+  }
+  return AbortSignal.any([signalA, signalB]);
+}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function sanitizeForCache(options: Record<string, unknown>): Record<string, unknown> {
