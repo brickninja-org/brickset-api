@@ -1,5 +1,13 @@
 import { BricksetApiError, fetchBricksetApi, type FetchBricksetApiOptions, type FetchOptions } from '@brickset-api/fetch';
-import type { EndpointType, KnownEndpoint, OptionsByEndpoint, SetCollectionParams } from '@brickset-api/types/endpoints';
+import type {
+  EndpointType,
+  KnownEndpoint,
+  OptionsByEndpoint,
+  SetCollectionParams,
+  SetMinifigCollectionParams,
+  SetUserFlagLabelsParams,
+  GetMinifigCollectionParams,
+} from '@brickset-api/types/endpoints';
 import type { GetSetsOptions } from '@brickset-api/types/data/get-sets';
 
 export type BricksetClientRequest<Url extends KnownEndpoint | (string & {})> = {
@@ -51,6 +59,20 @@ export class InMemoryBricksetClientCache implements BricksetClientCache {
   set(key: string, value: unknown): void {
     this.map.set(key, value);
   }
+}
+
+export function createRateLimitMiddleware(minIntervalMs: number): BricksetClientMiddleware {
+  let lastRunAt = 0;
+
+  return async (request, next) => {
+    const now = Date.now();
+    const waitMs = Math.max(0, lastRunAt + minIntervalMs - now);
+    if (waitMs > 0) {
+      await new Promise((resolve) => setTimeout(resolve, waitMs));
+    }
+    lastRunAt = Date.now();
+    return next(request);
+  };
 }
 
 export class BricksetApiClient {
@@ -246,6 +268,47 @@ export class BricksetApiClient {
       ...rest,
       apiKey: this.resolveApiKey(apiKey),
       userHash: this.resolveUserHash(userHash),
+    });
+  }
+
+  async getMinifigCollection(
+    params: GetMinifigCollectionParams,
+    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+  ): Promise<EndpointType<'/api/v3.asmx/getMinifigCollection'>> {
+    const { apiKey, userHash, ...rest } = options;
+    return this.request('/api/v3.asmx/getMinifigCollection', {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+      userHash: this.resolveUserHash(userHash),
+      params,
+    });
+  }
+
+  async setMinifigCollection(
+    minifigNumber: string,
+    params: SetMinifigCollectionParams,
+    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+  ): Promise<EndpointType<'/api/v3.asmx/setMinifigCollection'>> {
+    const { apiKey, userHash, ...rest } = options;
+    return this.request('/api/v3.asmx/setMinifigCollection', {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+      userHash: this.resolveUserHash(userHash),
+      minifigNumber,
+      params,
+    });
+  }
+
+  async setUserFlagLabels(
+    params: SetUserFlagLabelsParams,
+    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+  ): Promise<EndpointType<'/api/v3.asmx/setUserFlagLabels'>> {
+    const { apiKey, userHash, ...rest } = options;
+    return this.request('/api/v3.asmx/setUserFlagLabels', {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+      userHash: this.resolveUserHash(userHash),
+      params,
     });
   }
 

@@ -29,6 +29,13 @@ globalThis.fetch = async (request) => {
     });
   }
 
+  if (url.pathname.endsWith('/getMinifigCollection')) {
+    return new Response(JSON.stringify({ status: 'success', matches: 1, minifigs: [{ minifigNumber: 'fig-1', name: 'Figure', category: 'Test', ownedInSets: 1, ownedLoose: 0, ownedTotal: 1, wanted: false }] }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
   if (url.pathname.endsWith('/getInstructions')) {
     return new Response(JSON.stringify({ status: 'success', matches: 1, instructions: [{ URL: 'https://example.com', description: 'PDF' }] }), {
       status: 200,
@@ -66,10 +73,12 @@ await client.getThemes();
 await client.getAdditionalImages(10276);
 await client.getInstructions(10276);
 await client.getUserNotes();
+await client.getMinifigCollection({ owned: 1 });
 assert(calls.filter((c) => c.pathname.endsWith('/getThemes')).length === 1, 'getThemes should be cached by default');
 assert(calls.some((c) => c.pathname.endsWith('/getAdditionalImages') && c.searchParams.get('setID') === '10276'), 'getAdditionalImages should serialize setID');
 assert(calls.some((c) => c.pathname.endsWith('/getInstructions') && c.searchParams.get('setID') === '10276'), 'getInstructions should serialize setID');
 assert(calls.some((c) => c.pathname.endsWith('/getUserNotes') && c.searchParams.get('userHash') === 'h'), 'getUserNotes should include userHash');
+assert(calls.some((c) => c.pathname.endsWith('/getMinifigCollection') && c.searchParams.get('params')?.includes('\"owned\":1')), 'getMinifigCollection should serialize params JSON');
 
 let sawSanitized = false;
 try {

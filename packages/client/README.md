@@ -8,7 +8,7 @@ Built on:
 
 ## Features
 
-- Typed endpoint methods (`login`, `getSets`, `getThemes`, `getSubthemes`, `getYears`, `getCollection`, `getAdditionalImages`, `getInstructions`, `getInstructionsBySetNumber`, `getReviews`, `getKeyUsageStats`, `getUserNotes`, `getUserFlagLabels`, `getUserMinifigNotes`, `setCollection`)
+- Typed endpoint methods (`login`, `getSets`, `getThemes`, `getSubthemes`, `getYears`, `getCollection`, `getAdditionalImages`, `getInstructions`, `getInstructionsBySetNumber`, `getReviews`, `getKeyUsageStats`, `getUserNotes`, `getUserFlagLabels`, `setUserFlagLabels`, `getUserMinifigNotes`, `getMinifigCollection`, `setMinifigCollection`, `setCollection`)
 - Safe defaults for caching
 - Middleware pipeline
 - Error sanitization to avoid leaking request secrets
@@ -37,6 +37,7 @@ const images = await client.getAdditionalImages(10276);
 const instructions = await client.getInstructions(10276);
 const reviews = await client.getReviews(10276);
 const usage = await client.getKeyUsageStats();
+const minifigs = await client.getMinifigCollection({ owned: 1 });
 ```
 
 ## Security defaults
@@ -58,5 +59,16 @@ const client = new BricksetApiClient({
     console.log(request.endpoint, Date.now() - started);
     return result;
   }],
+});
+```
+
+Rate limiting helper:
+
+```ts
+import { BricksetApiClient, createRateLimitMiddleware } from '@brickset-api/client';
+
+const client = new BricksetApiClient({
+  auth: { apiKey: '...' },
+  middlewares: [createRateLimitMiddleware(250)],
 });
 ```
