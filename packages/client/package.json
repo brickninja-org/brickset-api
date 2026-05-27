@@ -1,0 +1,34 @@
+{
+  "name": "@brickset-api/client",
+  "version": "0.0.1",
+  "description": "High-level client for the Brickset API with middleware and caching primitives",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brickninja-org/brickset-api.git",
+    "directory": "packages/client"
+  },
+  "keywords": [
+    "brickset-api",
+    "client",
+    "brickset",
+    "api",
+    "typescript"
+  ],
+  "scripts": {
+    "test": "tsc --noEmit",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@brickset-api/fetch": "workspace:*",
+    "@brickset-api/types": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}
