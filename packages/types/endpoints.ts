@@ -1,7 +1,9 @@
+import type { GetCollection } from "./data/get-collection";
 import type { GetSets } from "./data/get-sets";
 import type { GetThemes } from "./data/get-themes";
 
 export type KnownAuthenticatedEndpoint =
+  | '/api/v3.asmx/getCollection'
   | '/api/v3.asmx/setCollection';
 
 export type KnownUnauthorizedEndpoint =
@@ -61,6 +63,7 @@ export type ApiResponse<T> = { status: 'success' } & T | { status: 'error'; mess
 type LoginResponse = ApiResponse<{ hash: string }>;
 type CheckUserHashResponse = ApiResponse<Record<string, never>>;
 type SetCollectionResponse = ApiResponse<Record<string, never>>;
+type GetCollectionResponse = ApiResponse<{ matches: number; sets: GetCollection[] }>;
 type GetSetsResponse = ApiResponse<{ matches: number; sets: GetSets[] }>;
 type GetThemesResponse = ApiResponse<{ matches: number; themes: GetThemes[] }>;
 
@@ -70,6 +73,7 @@ type GetThemesResponse = ApiResponse<{ matches: number; themes: GetThemes[] }>;
 export type EndpointType<Url extends KnownEndpoint | (string & {})> =
   Url extends '/api/v3.asmx/login' ? LoginResponse :
   Url extends '/api/v3.asmx/checkUserHash' ? CheckUserHashResponse :
+  Url extends '/api/v3.asmx/getCollection' ? GetCollectionResponse :
   Url extends SetCollectionUrl ? SetCollectionResponse :
   Url extends GetSetsUrl ? GetSetsResponse :
   Url extends '/api/v3.asmx/getThemes' ? GetThemesResponse :
