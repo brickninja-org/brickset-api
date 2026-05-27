@@ -19,7 +19,8 @@
   ],
   "scripts": {
     "test": "tsc --noEmit",
-    "build": "tsc"
+    "build": "tsc",
+    "test:integration": "pnpm build && node scripts/verify-client-behavior.mjs"
   },
   "dependencies": {
     "@brickset-api/fetch": "workspace:*",
