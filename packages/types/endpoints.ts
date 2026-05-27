@@ -27,12 +27,10 @@ type UrlWithParams<Url extends KnownEndpoint> =
 
 type GetSetsUrl =
   | '/api/v3.asmx/getSets'
-  | UrlWithParams<'/api/v3.asmx/getSets'>
-  | WithParameters<'/api/v3.asmx/getSets', string>;
+  | UrlWithParams<'/api/v3.asmx/getSets'>;
 
 type SetCollectionUrl =
-  | WithParameters<'/api/v3.asmx/setCollection', `setID=${string}&params=${string}`>
-  | WithParameters<'/api/v3.asmx/setCollection', `params=${string}&setID=${string}`>;
+  | WithParameters<'/api/v3.asmx/setCollection', CombineParameters<`setID=${string}`, `params=${string}`>>;
 
 // options
 type Options = {};
