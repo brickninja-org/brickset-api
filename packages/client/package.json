@@ -18,7 +18,7 @@
     "typescript"
   ],
   "scripts": {
-    "test": "tsc --noEmit",
+    "test": "pnpm -C ../fetch build && tsc --noEmit",
     "build": "tsc",
     "test:integration": "pnpm build && node scripts/verify-client-behavior.mjs"
   },
