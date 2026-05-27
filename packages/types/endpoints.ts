@@ -2,7 +2,7 @@ import type { GetSets } from "./data/get-sets";
 import type { GetThemes } from "./data/get-themes";
 
 export type KnownAuthenticatedEndpoint =
-  | '/setCollection';
+  | '/api/v3.asmx/setCollection';
 
 export type KnownUnauthorizedEndpoint =
   | '/api/v3.asmx/getSets'
