@@ -136,17 +136,16 @@ export type LoginOptions = {
 
 export type OptionsByEndpoint<Endpoint extends string> =
   Endpoint extends '/api/v3.asmx/login' ? PublicOptions & LoginOptions :
-  Endpoint extends KnownAuthenticatedEndpoint ? UserOptions :
   Endpoint extends GetSetsUrl ? PublicOptions & { params: GetSetsOptions; userHash?: string } :
   Endpoint extends SetCollectionUrl ? UserOptions & { setID: number; params: SetCollectionParams } :
   Endpoint extends SetMinifigCollectionUrl ? UserOptions & { minifigNumber: string; params: SetMinifigCollectionParams } :
   Endpoint extends GetMinifigCollectionUrl ? UserOptions & { params: GetMinifigCollectionParams } :
   Endpoint extends SetUserFlagLabelsUrl ? UserOptions & { params: SetUserFlagLabelsParams } :
+  Endpoint extends KnownAuthenticatedEndpoint ? UserOptions :
   Endpoint extends SetIdEndpointsUrl ? PublicOptions & { setID: number } :
   Endpoint extends SetNumberEndpointsUrl ? PublicOptions & { setNumber: string } :
   Endpoint extends SubthemesEndpointUrl ? PublicOptions & { theme: string } :
-  Endpoint extends WithTheme<'/api/v3.asmx/getYears'> ? PublicOptions & { theme: string } :
-  Endpoint extends YearsEndpointUrl ? PublicOptions :
+  Endpoint extends YearsEndpointUrl ? PublicOptions & { theme?: string } :
   Endpoint extends KnownEndpoint ? PublicOptions :
   Partial<ApiKeyOptions>;
 

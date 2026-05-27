@@ -1,5 +1,5 @@
 import { BricksetApiError, fetchBricksetApi, type FetchBricksetApiOptions, type FetchOptions } from '@brickset-api/fetch';
-import type { EndpointType, KnownEndpoint, OptionsByEndpoint } from '@brickset-api/types/endpoints';
+import type { EndpointType, KnownEndpoint, OptionsByEndpoint, SetCollectionParams } from '@brickset-api/types/endpoints';
 import type { GetSetsOptions } from '@brickset-api/types/data/get-sets';
 
 export type BricksetClientRequest<Url extends KnownEndpoint | (string & {})> = {
@@ -142,6 +142,73 @@ export class BricksetApiClient {
     });
   }
 
+  async getThemes(
+    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+  ): Promise<EndpointType<'/api/v3.asmx/getThemes'>> {
+    const { apiKey, ...rest } = options;
+    return this.request('/api/v3.asmx/getThemes', {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+    });
+  }
+
+  async getSubthemes(
+    theme: string,
+    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+  ): Promise<EndpointType<'/api/v3.asmx/getSubthemes'>> {
+    const { apiKey, ...rest } = options;
+    return this.request('/api/v3.asmx/getSubthemes', {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+      theme,
+    });
+  }
+
+  async getYears(
+    theme?: string,
+    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+  ): Promise<EndpointType<'/api/v3.asmx/getYears'>> {
+    const { apiKey, ...rest } = options;
+    const resolvedApiKey = this.resolveApiKey(apiKey);
+    if (theme) {
+      return this.request('/api/v3.asmx/getYears', {
+        ...rest,
+        apiKey: resolvedApiKey,
+        theme,
+      });
+    }
+    return this.request('/api/v3.asmx/getYears', {
+      ...rest,
+      apiKey: resolvedApiKey,
+    });
+  }
+
+  async getCollection(
+    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+  ): Promise<EndpointType<'/api/v3.asmx/getCollection'>> {
+    const { apiKey, userHash, ...rest } = options;
+    return this.request('/api/v3.asmx/getCollection', {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+      userHash: this.resolveUserHash(userHash),
+    });
+  }
+
+  async setCollection(
+    setID: number,
+    params: SetCollectionParams,
+    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+  ): Promise<EndpointType<'/api/v3.asmx/setCollection'>> {
+    const { apiKey, userHash, ...rest } = options;
+    return this.request('/api/v3.asmx/setCollection', {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+      userHash: this.resolveUserHash(userHash),
+      setID,
+      params,
+    });
+  }
+
   private runMiddlewares<Url extends KnownEndpoint | (string & {})>(
     request: BricksetClientRequest<Url>,
     last: (request: BricksetClientRequest<Url>) => Promise<EndpointType<Url>>,
@@ -160,6 +227,14 @@ export class BricksetApiClient {
     const resolved = apiKey ?? this.auth?.apiKey;
     if (!resolved) {
       throw new Error('No apiKey provided. Pass apiKey in request options or configure client auth.apiKey.');
+    }
+    return resolved;
+  }
+
+  private resolveUserHash(userHash?: string): string {
+    const resolved = userHash ?? this.auth?.userHash;
+    if (!resolved) {
+      throw new Error('No userHash provided. Pass userHash in request options or configure client auth.userHash.');
     }
     return resolved;
   }
