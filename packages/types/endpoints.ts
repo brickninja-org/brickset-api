@@ -6,7 +6,8 @@ export type KnownAuthenticatedEndpoint =
 
 export type KnownUnauthorizedEndpoint =
   | '/api/v3.asmx/getSets'
-  | '/api/v3.asmx/getThemes';
+  | '/api/v3.asmx/getThemes'
+  | '/api/v3.asmx/login';
 
 export type KnownEndpoint = KnownAuthenticatedEndpoint | KnownUnauthorizedEndpoint;
 
@@ -30,7 +31,13 @@ export type AuthenticatedOptions = {
   userHash: string;
 };
 
+export type LoginOptions = {
+  username: string;
+  password: string;
+};
+
 export type OptionsByEndpoint<Endpoint extends string> =
+  Endpoint extends '/api/v3.asmx/login' ? Options & ApiKeyOptions & LoginOptions :
   Endpoint extends UrlWithParams<'/api/v3.asmx/getSets'> ? Options & ApiKeyOptions :
   Endpoint extends KnownAuthenticatedEndpoint ? Options & ApiKeyOptions & AuthenticatedOptions :
   Endpoint extends KnownEndpoint ? Options & ApiKeyOptions :
@@ -43,6 +50,7 @@ export type ApiResponse<T> = { status: 'success' } & T | { status: 'error'; mess
 
 // result type for endpoint
 export type EndpointType<Url extends KnownEndpoint | (string & {})> =
+  Url extends '/api/v3.asmx/login' ? ApiResponse<{ hash: string }> :
   Url extends UrlWithParams<'/api/v3.asmx/getSets'> ? ApiResponse<{ matches: number; sets: GetSets[] }> :
   Url extends '/api/v3.asmx/getThemes' ? ApiResponse<{ matches: number, themes: GetThemes[] }> :
   unknown;
