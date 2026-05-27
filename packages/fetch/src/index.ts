@@ -27,8 +27,6 @@ export async function fetchBricksetApi<
 
   if (hasUserHash(resolvedOptions)) {
     url.searchParams.set('userHash', resolvedOptions.userHash);
-  } else {
-    url.searchParams.set('userHash', '');
   }
 
   // build request
