@@ -15,6 +15,20 @@ globalThis.fetch = async (request) => {
     });
   }
 
+  if (url.pathname.endsWith('/getAdditionalImages')) {
+    return new Response(JSON.stringify({ status: 'success', matches: 1, additionalImages: [{ thumbnailURL: 'https://example.com/t.jpg', imageURL: 'https://example.com/i.jpg' }] }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
+  if (url.pathname.endsWith('/getUserNotes')) {
+    return new Response(JSON.stringify({ status: 'success', matches: 1, userNotes: [{ setID: 10276, notes: 'note' }] }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
   if (url.pathname.endsWith('/getInstructions')) {
     return new Response(JSON.stringify({ status: 'success', matches: 1, instructions: [{ URL: 'https://example.com', description: 'PDF' }] }), {
       status: 200,
@@ -49,9 +63,13 @@ const client = new BricksetApiClient({
 
 await client.getThemes();
 await client.getThemes();
+await client.getAdditionalImages(10276);
 await client.getInstructions(10276);
+await client.getUserNotes();
 assert(calls.filter((c) => c.pathname.endsWith('/getThemes')).length === 1, 'getThemes should be cached by default');
+assert(calls.some((c) => c.pathname.endsWith('/getAdditionalImages') && c.searchParams.get('setID') === '10276'), 'getAdditionalImages should serialize setID');
 assert(calls.some((c) => c.pathname.endsWith('/getInstructions') && c.searchParams.get('setID') === '10276'), 'getInstructions should serialize setID');
+assert(calls.some((c) => c.pathname.endsWith('/getUserNotes') && c.searchParams.get('userHash') === 'h'), 'getUserNotes should include userHash');
 
 let sawSanitized = false;
 try {

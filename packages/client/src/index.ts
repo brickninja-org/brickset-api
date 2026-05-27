@@ -194,6 +194,61 @@ export class BricksetApiClient {
     });
   }
 
+  async getAdditionalImages(
+    setID: number,
+    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+  ): Promise<EndpointType<'/api/v3.asmx/getAdditionalImages'>> {
+    const { apiKey, ...rest } = options;
+    return this.request('/api/v3.asmx/getAdditionalImages', {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+      setID,
+    });
+  }
+
+  async getKeyUsageStats(
+    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+  ): Promise<EndpointType<'/api/v3.asmx/getKeyUsageStats'>> {
+    const { apiKey, ...rest } = options;
+    return this.request('/api/v3.asmx/getKeyUsageStats', {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+    });
+  }
+
+  async getUserNotes(
+    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+  ): Promise<EndpointType<'/api/v3.asmx/getUserNotes'>> {
+    const { apiKey, userHash, ...rest } = options;
+    return this.request('/api/v3.asmx/getUserNotes', {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+      userHash: this.resolveUserHash(userHash),
+    });
+  }
+
+  async getUserFlagLabels(
+    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+  ): Promise<EndpointType<'/api/v3.asmx/getUserFlagLabels'>> {
+    const { apiKey, userHash, ...rest } = options;
+    return this.request('/api/v3.asmx/getUserFlagLabels', {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+      userHash: this.resolveUserHash(userHash),
+    });
+  }
+
+  async getUserMinifigNotes(
+    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+  ): Promise<EndpointType<'/api/v3.asmx/getUserMinifigNotes'>> {
+    const { apiKey, userHash, ...rest } = options;
+    return this.request('/api/v3.asmx/getUserMinifigNotes', {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+      userHash: this.resolveUserHash(userHash),
+    });
+  }
+
   async getInstructions(
     setID: number,
     options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
