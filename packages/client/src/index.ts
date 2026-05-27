@@ -194,6 +194,42 @@ export class BricksetApiClient {
     });
   }
 
+  async getInstructions(
+    setID: number,
+    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+  ): Promise<EndpointType<'/api/v3.asmx/getInstructions'>> {
+    const { apiKey, ...rest } = options;
+    return this.request('/api/v3.asmx/getInstructions', {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+      setID,
+    });
+  }
+
+  async getInstructionsBySetNumber(
+    setNumber: string,
+    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+  ): Promise<EndpointType<'/api/v3.asmx/getInstructions2'>> {
+    const { apiKey, ...rest } = options;
+    return this.request('/api/v3.asmx/getInstructions2', {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+      setNumber,
+    });
+  }
+
+  async getReviews(
+    setID: number,
+    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+  ): Promise<EndpointType<'/api/v3.asmx/getReviews'>> {
+    const { apiKey, ...rest } = options;
+    return this.request('/api/v3.asmx/getReviews', {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+      setID,
+    });
+  }
+
   async setCollection(
     setID: number,
     params: SetCollectionParams,

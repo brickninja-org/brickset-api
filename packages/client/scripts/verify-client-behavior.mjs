@@ -15,6 +15,13 @@ globalThis.fetch = async (request) => {
     });
   }
 
+  if (url.pathname.endsWith('/getInstructions')) {
+    return new Response(JSON.stringify({ status: 'success', matches: 1, instructions: [{ URL: 'https://example.com', description: 'PDF' }] }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
   if (url.pathname.endsWith('/setCollection')) {
     return new Response(JSON.stringify({ status: 'error', message: 'forced error' }), {
       status: 400,
@@ -42,7 +49,9 @@ const client = new BricksetApiClient({
 
 await client.getThemes();
 await client.getThemes();
+await client.getInstructions(10276);
 assert(calls.filter((c) => c.pathname.endsWith('/getThemes')).length === 1, 'getThemes should be cached by default');
+assert(calls.some((c) => c.pathname.endsWith('/getInstructions') && c.searchParams.get('setID') === '10276'), 'getInstructions should serialize setID');
 
 let sawSanitized = false;
 try {

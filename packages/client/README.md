@@ -33,6 +33,8 @@ const client = new BricksetApiClient({
 
 const themes = await client.getThemes();
 const sets = await client.getSets({ theme: 'Technic', pageSize: 50 });
+const instructions = await client.getInstructions(10276);
+const reviews = await client.getReviews(10276);
 ```
 
 ## Security defaults
