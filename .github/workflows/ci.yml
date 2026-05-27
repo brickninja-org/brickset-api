@@ -7,6 +7,9 @@ on:
     branches: [ "main" ]
   merge_group:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
@@ -53,16 +56,8 @@ jobs:
       id-token: write
       pull-requests: write
     steps:
-      - uses: actions/create-github-app-token@v1
-        id: generate-token
-        with:
-          app-id: ${{ secrets.BRICKSET_RELEASE_APP_ID }}
-          private-key: ${{ secrets.BRICKSET_RELEASE_APP_PRIVATE_KEY }}
-
       - name: Checkout Repo
         uses: actions/checkout@v5
-        with:
-          token: ${{ steps.generate-token.outputs.token }}
 
       - name: Setup Node.js 22
         uses: actions/setup-node@v5
@@ -87,7 +82,7 @@ jobs:
       - name: Create Release Pull Request
         uses: changesets/action@v1
         env:
-          GITHUB_TOKEN: ${{ steps.generate-token.outputs.token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_CONFIG_PROVENANCE: true
         with:
           title: New Release
