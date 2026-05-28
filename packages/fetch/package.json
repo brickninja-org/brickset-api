@@ -26,7 +26,7 @@
     "typescript": "6.0.3"
   },
   "peerDependencies": {
-    "@brickset-api/types": "~0.0.18"
+    "@brickset-api/types": "~0.0.19"
   },
   "publishConfig": {
     "access": "public"

@@ -1,5 +1,19 @@
 # @brickset-api/client
 
+## 0.1.1
+
+### Patch Changes
+
+- 8adc9e7: Align Brickset API parameter modeling and client-side validation:
+
+  - Fix `getSets` options typing so `query` matches docs as a string search term.
+  - Add stricter `setUserFlagLabels` typing helper in types.
+  - Add runtime validation guards in client for documented limits (pagination, quantity ranges, rating, flag-label length).
+
+- Updated dependencies [8adc9e7]
+  - @brickset-api/types@0.0.19
+  - @brickset-api/fetch@0.0.20
+
 ## 0.1.0
 
 ### Minor Changes
