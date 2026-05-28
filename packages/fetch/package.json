@@ -3,6 +3,7 @@
   "version": "0.0.20",
   "description": "Tiny wrapper around fetch that returns type-safe responses",
   "license": "MIT",
+  "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "repository": {
