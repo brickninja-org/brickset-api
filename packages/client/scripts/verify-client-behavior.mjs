@@ -111,6 +111,8 @@ const client = new BricksetApiClient({
 
 await client.getThemes();
 await client.getThemes();
+await client.checkKey();
+await client.checkUserHash();
 await client.getAdditionalImages(10276);
 await client.getInstructions(10276);
 await client.getUserNotes();
@@ -119,6 +121,8 @@ assert(calls.filter((c) => c.pathname.endsWith('/getThemes')).length === 1, 'get
 assert(calls.some((c) => c.pathname.endsWith('/getAdditionalImages') && c.searchParams.get('setID') === '10276'), 'getAdditionalImages should serialize setID');
 assert(calls.some((c) => c.pathname.endsWith('/getInstructions') && c.searchParams.get('setID') === '10276'), 'getInstructions should serialize setID');
 assert(calls.some((c) => c.pathname.endsWith('/getUserNotes') && c.searchParams.get('userHash') === 'h'), 'getUserNotes should include userHash');
+assert(calls.some((c) => c.pathname.endsWith('/checkKey')), 'checkKey should call the checkKey endpoint');
+assert(calls.some((c) => c.pathname.endsWith('/checkUserHash') && c.searchParams.get('userHash') === 'h'), 'checkUserHash should include userHash');
 assert(calls.some((c) => c.pathname.endsWith('/getMinifigCollection') && c.searchParams.get('params')?.includes('\"owned\":1')), 'getMinifigCollection should serialize params JSON');
 
 let sawSanitized = false;
@@ -149,5 +153,37 @@ try {
   timeoutSanitized = error instanceof BricksetClientError;
 }
 assert(timeoutSanitized, 'Timeout middleware should trigger a sanitized BricksetClientError');
+
+let rejectedInvalidGetSets = false;
+try {
+  await client.getSets({ pageSize: 9999 });
+} catch (error) {
+  rejectedInvalidGetSets = error instanceof Error && error.message.includes('pageSize');
+}
+assert(rejectedInvalidGetSets, 'Expected getSets to reject invalid pageSize');
+
+let rejectedInvalidFlags = false;
+try {
+  await client.setUserFlagLabels({ 1: 'this-label-is-definitely-way-too-long' });
+} catch (error) {
+  rejectedInvalidFlags = error instanceof Error && error.message.includes('20 characters');
+}
+assert(rejectedInvalidFlags, 'Expected setUserFlagLabels to reject too-long flag labels');
+
+let rejectedInvalidCollectionQty = false;
+try {
+  await client.setCollection(1, { qtyOwned: 1000 });
+} catch (error) {
+  rejectedInvalidCollectionQty = error instanceof Error && error.message.includes('qtyOwned');
+}
+assert(rejectedInvalidCollectionQty, 'Expected setCollection to reject qtyOwned above 999');
+
+let rejectedInvalidMinifigQty = false;
+try {
+  await client.setMinifigCollection('fig-1', { qtyOwned: -1 });
+} catch (error) {
+  rejectedInvalidMinifigQty = error instanceof Error && error.message.includes('qtyOwned');
+}
+assert(rejectedInvalidMinifigQty, 'Expected setMinifigCollection to reject negative qtyOwned');
 
 console.log('client behavior integration check passed');
