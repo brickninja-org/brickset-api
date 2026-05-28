@@ -1,5 +1,11 @@
 # @brickset-api/fetch
 
+## 0.0.21
+
+### Patch Changes
+
+- 1745a68: Mark package metadata as ESM to eliminate Node module type warnings in runtime and scripts.
+
 ## 0.0.20
 
 ### Patch Changes

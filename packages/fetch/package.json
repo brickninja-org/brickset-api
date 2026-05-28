@@ -1,6 +1,6 @@
 {
   "name": "@brickset-api/fetch",
-  "version": "0.0.20",
+  "version": "0.0.21",
   "description": "Tiny wrapper around fetch that returns type-safe responses",
   "license": "MIT",
   "type": "module",
