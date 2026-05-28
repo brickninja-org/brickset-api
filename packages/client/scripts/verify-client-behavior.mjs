@@ -129,7 +129,13 @@ let sawSanitized = false;
 try {
   await client.setCollection(1, { own: 1 });
 } catch (error) {
-  sawSanitized = error instanceof BricksetClientError && !String(error.message).includes('apiKey');
+  const serialized = JSON.stringify(error, Object.getOwnPropertyNames(error));
+  sawSanitized =
+    error instanceof BricksetClientError &&
+    !String(error.message).includes('apiKey') &&
+    !serialized.includes('apiKey') &&
+    !serialized.includes('userHash') &&
+    !('causeError' in error);
 }
 assert(sawSanitized, 'Expected sanitized BricksetClientError for failed setCollection');
 

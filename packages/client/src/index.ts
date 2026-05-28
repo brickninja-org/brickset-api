@@ -50,6 +50,9 @@ export type BricksetClientOptions = {
   cache?: BricksetClientCache;
 };
 
+type PublicMethodOptions = FetchOptions & FetchBricksetApiOptions & { apiKey?: string };
+type UserMethodOptions = PublicMethodOptions & { userHash?: string };
+
 export type RequestBatchOptions = {
   concurrency?: number;
 };
@@ -229,254 +232,140 @@ export class BricksetApiClient {
   async login(
     username: string,
     password: string,
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+    options: PublicMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/login'>> {
-    const { apiKey, ...rest } = options;
-    return this.request('/api/v3.asmx/login', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-      username,
-      password,
-    });
+    return this.requestPublic('/api/v3.asmx/login', options, { username, password });
   }
 
   async checkKey(
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+    options: PublicMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/checkKey'>> {
-    const { apiKey, ...rest } = options;
-    return this.request('/api/v3.asmx/checkKey', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-    });
+    return this.requestPublic('/api/v3.asmx/checkKey', options);
   }
 
   async checkUserHash(
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+    options: UserMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/checkUserHash'>> {
-    const { apiKey, userHash, ...rest } = options;
-    return this.request('/api/v3.asmx/checkUserHash', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-      userHash: this.resolveUserHash(userHash),
-    });
+    return this.requestAuthenticated('/api/v3.asmx/checkUserHash', options);
   }
 
   async getSets(
     params: GetSetsOptions,
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+    options: UserMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/getSets'>> {
     validateGetSetsParams(params);
-    const { apiKey, userHash, ...rest } = options;
-    const resolvedUserHash = userHash ?? this.auth?.userHash;
-
-    return this.request('/api/v3.asmx/getSets', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-      ...(resolvedUserHash ? { userHash: resolvedUserHash } : {}),
-      params,
-    });
+    return this.requestOptionalUserHash('/api/v3.asmx/getSets', options, { params });
   }
 
   async getThemes(
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+    options: PublicMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/getThemes'>> {
-    const { apiKey, ...rest } = options;
-    return this.request('/api/v3.asmx/getThemes', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-    });
+    return this.requestPublic('/api/v3.asmx/getThemes', options);
   }
 
   async getSubthemes(
     theme: string,
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+    options: PublicMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/getSubthemes'>> {
-    const { apiKey, ...rest } = options;
-    return this.request('/api/v3.asmx/getSubthemes', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-      theme,
-    });
+    return this.requestPublic('/api/v3.asmx/getSubthemes', options, { theme });
   }
 
   async getYears(
     theme?: string,
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+    options: PublicMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/getYears'>> {
-    const { apiKey, ...rest } = options;
-    const resolvedApiKey = this.resolveApiKey(apiKey);
-    if (theme) {
-      return this.request('/api/v3.asmx/getYears', {
-        ...rest,
-        apiKey: resolvedApiKey,
-        theme,
-      });
-    }
-    return this.request('/api/v3.asmx/getYears', {
-      ...rest,
-      apiKey: resolvedApiKey,
-    });
+    return this.requestPublic('/api/v3.asmx/getYears', options, theme ? { theme } : {});
   }
 
   async getCollection(
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+    options: UserMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/getCollection'>> {
-    const { apiKey, userHash, ...rest } = options;
-    return this.request('/api/v3.asmx/getCollection', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-      userHash: this.resolveUserHash(userHash),
-    });
+    return this.requestAuthenticated('/api/v3.asmx/getCollection', options);
   }
 
   async getAdditionalImages(
     setID: number,
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+    options: PublicMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/getAdditionalImages'>> {
-    const { apiKey, ...rest } = options;
-    return this.request('/api/v3.asmx/getAdditionalImages', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-      setID,
-    });
+    return this.requestPublic('/api/v3.asmx/getAdditionalImages', options, { setID });
   }
 
   async getKeyUsageStats(
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+    options: PublicMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/getKeyUsageStats'>> {
-    const { apiKey, ...rest } = options;
-    return this.request('/api/v3.asmx/getKeyUsageStats', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-    });
+    return this.requestPublic('/api/v3.asmx/getKeyUsageStats', options);
   }
 
   async getUserNotes(
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+    options: UserMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/getUserNotes'>> {
-    const { apiKey, userHash, ...rest } = options;
-    return this.request('/api/v3.asmx/getUserNotes', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-      userHash: this.resolveUserHash(userHash),
-    });
+    return this.requestAuthenticated('/api/v3.asmx/getUserNotes', options);
   }
 
   async getUserFlagLabels(
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+    options: UserMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/getUserFlagLabels'>> {
-    const { apiKey, userHash, ...rest } = options;
-    return this.request('/api/v3.asmx/getUserFlagLabels', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-      userHash: this.resolveUserHash(userHash),
-    });
+    return this.requestAuthenticated('/api/v3.asmx/getUserFlagLabels', options);
   }
 
   async getUserMinifigNotes(
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+    options: UserMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/getUserMinifigNotes'>> {
-    const { apiKey, userHash, ...rest } = options;
-    return this.request('/api/v3.asmx/getUserMinifigNotes', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-      userHash: this.resolveUserHash(userHash),
-    });
+    return this.requestAuthenticated('/api/v3.asmx/getUserMinifigNotes', options);
   }
 
   async getMinifigCollection(
     params: GetMinifigCollectionParams,
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+    options: UserMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/getMinifigCollection'>> {
-    const { apiKey, userHash, ...rest } = options;
-    return this.request('/api/v3.asmx/getMinifigCollection', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-      userHash: this.resolveUserHash(userHash),
-      params,
-    });
+    return this.requestAuthenticated('/api/v3.asmx/getMinifigCollection', options, { params });
   }
 
   async setMinifigCollection(
     minifigNumber: string,
     params: SetMinifigCollectionParams,
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+    options: UserMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/setMinifigCollection'>> {
     validateSetMinifigCollectionParams(params);
-    const { apiKey, userHash, ...rest } = options;
-    return this.request('/api/v3.asmx/setMinifigCollection', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-      userHash: this.resolveUserHash(userHash),
-      minifigNumber,
-      params,
-    });
+    return this.requestAuthenticated('/api/v3.asmx/setMinifigCollection', options, { minifigNumber, params });
   }
 
   async setUserFlagLabels(
     params: SetUserFlagLabelsParams,
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+    options: UserMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/setUserFlagLabels'>> {
     validateSetUserFlagLabelsParams(params);
-    const { apiKey, userHash, ...rest } = options;
-    return this.request('/api/v3.asmx/setUserFlagLabels', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-      userHash: this.resolveUserHash(userHash),
-      params,
-    });
+    return this.requestAuthenticated('/api/v3.asmx/setUserFlagLabels', options, { params });
   }
 
   async getInstructions(
     setID: number,
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+    options: PublicMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/getInstructions'>> {
-    const { apiKey, ...rest } = options;
-    return this.request('/api/v3.asmx/getInstructions', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-      setID,
-    });
+    return this.requestPublic('/api/v3.asmx/getInstructions', options, { setID });
   }
 
   async getInstructionsBySetNumber(
     setNumber: string,
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+    options: PublicMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/getInstructions2'>> {
-    const { apiKey, ...rest } = options;
-    return this.request('/api/v3.asmx/getInstructions2', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-      setNumber,
-    });
+    return this.requestPublic('/api/v3.asmx/getInstructions2', options, { setNumber });
   }
 
   async getReviews(
     setID: number,
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+    options: PublicMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/getReviews'>> {
-    const { apiKey, ...rest } = options;
-    return this.request('/api/v3.asmx/getReviews', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-      setID,
-    });
+    return this.requestPublic('/api/v3.asmx/getReviews', options, { setID });
   }
 
   async setCollection(
     setID: number,
     params: SetCollectionParams,
-    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+    options: UserMethodOptions = {},
   ): Promise<EndpointType<'/api/v3.asmx/setCollection'>> {
     validateSetCollectionParams(params);
-    const { apiKey, userHash, ...rest } = options;
-    return this.request('/api/v3.asmx/setCollection', {
-      ...rest,
-      apiKey: this.resolveApiKey(apiKey),
-      userHash: this.resolveUserHash(userHash),
-      setID,
-      params,
-    });
+    return this.requestAuthenticated('/api/v3.asmx/setCollection', options, { setID, params });
   }
 
   private runMiddlewares<Url extends KnownEndpoint | (string & {})>(
@@ -509,6 +398,45 @@ export class BricksetApiClient {
     return resolved;
   }
 
+  private requestPublic<
+    Url extends KnownEndpoint | (string & {}),
+    Extra extends Record<string, unknown> = Record<string, never>,
+  >(endpoint: Url, options: PublicMethodOptions, extra?: Extra): Promise<EndpointType<Url>> {
+    const { apiKey, ...rest } = options;
+    return this.request(endpoint, {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+      ...(extra ?? {}),
+    } as unknown as BricksetClientRequestOptions<Url>);
+  }
+
+  private requestAuthenticated<
+    Url extends KnownEndpoint | (string & {}),
+    Extra extends Record<string, unknown> = Record<string, never>,
+  >(endpoint: Url, options: UserMethodOptions, extra?: Extra): Promise<EndpointType<Url>> {
+    const { apiKey, userHash, ...rest } = options;
+    return this.request(endpoint, {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+      userHash: this.resolveUserHash(userHash),
+      ...(extra ?? {}),
+    } as unknown as BricksetClientRequestOptions<Url>);
+  }
+
+  private requestOptionalUserHash<
+    Url extends KnownEndpoint | (string & {}),
+    Extra extends Record<string, unknown> = Record<string, never>,
+  >(endpoint: Url, options: UserMethodOptions, extra?: Extra): Promise<EndpointType<Url>> {
+    const { apiKey, userHash, ...rest } = options;
+    const resolvedUserHash = userHash ?? this.auth?.userHash;
+    return this.request(endpoint, {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+      ...(resolvedUserHash ? { userHash: resolvedUserHash } : {}),
+      ...(extra ?? {}),
+    } as unknown as BricksetClientRequestOptions<Url>);
+  }
+
   private createCacheKey<Url extends KnownEndpoint | (string & {})>(request: BricksetClientRequest<Url>): string {
     const sanitized = sanitizeForCache(request.options);
     return JSON.stringify({
@@ -519,10 +447,7 @@ export class BricksetApiClient {
 }
 
 export class BricksetClientError extends Error {
-  constructor(
-    message: string,
-    public causeError?: unknown,
-  ) {
+  constructor(message: string) {
     super(message);
     this.name = 'BricksetClientError';
   }
@@ -578,14 +503,11 @@ function sanitizeForCache(options: Record<string, unknown>): Record<string, unkn
 
 function sanitizeClientError(error: unknown): BricksetClientError {
   if (error instanceof BricksetApiError) {
-    return new BricksetClientError(
-      `Brickset API request failed with status ${error.response.status} ${error.response.statusText}.`,
-      error,
-    );
+    return new BricksetClientError(`Brickset API request failed with status ${error.response.status} ${error.response.statusText}.`);
   }
 
   if (error instanceof Error) {
-    return new BricksetClientError('Brickset API request failed.', error);
+    return new BricksetClientError('Brickset API request failed.');
   }
 
   return new BricksetClientError('Brickset API request failed.');

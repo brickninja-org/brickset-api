@@ -30,3 +30,10 @@ type InstructionsBySetNumber = EndpointType<'/api/v3.asmx/getInstructions2?setNu
 type _InstructionsShapeStable = Assert<IsEqual<InstructionsBySetId, InstructionsBySetNumber>>;
 
 type _UnknownEndpointIsUnknown = Assert<IsEqual<EndpointType<'/api/v3.asmx/notReal'>, unknown>>;
+
+type _CheckKeyOptions = Assert<HasKey<OptionsByEndpoint<'/api/v3.asmx/checkKey'>, 'apiKey'>>;
+type _CheckUserHashOptions = Assert<HasKey<OptionsByEndpoint<'/api/v3.asmx/checkUserHash'>, 'userHash'>>;
+type _GetCollectionOptions = Assert<HasKey<OptionsByEndpoint<'/api/v3.asmx/getCollection'>, 'userHash'>>;
+type _GetAdditionalImagesOptions = Assert<HasKey<OptionsByEndpoint<'/api/v3.asmx/getAdditionalImages?setID=10276'>, 'setID'>>;
+type _GetReviewsOptions = Assert<HasKey<OptionsByEndpoint<'/api/v3.asmx/getReviews?setID=10276'>, 'setID'>>;
+type _GetSubthemesOptions = Assert<HasKey<OptionsByEndpoint<'/api/v3.asmx/getSubthemes?theme=Technic'>, 'theme'>>;
