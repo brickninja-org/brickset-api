@@ -8,7 +8,7 @@ Built on:
 
 ## Features
 
-- Typed endpoint methods (`login`, `getSets`, `getThemes`, `getSubthemes`, `getYears`, `getCollection`, `getAdditionalImages`, `getInstructions`, `getInstructionsBySetNumber`, `getReviews`, `getKeyUsageStats`, `getUserNotes`, `getUserFlagLabels`, `setUserFlagLabels`, `getUserMinifigNotes`, `getMinifigCollection`, `setMinifigCollection`, `setCollection`)
+- Typed endpoint methods (`login`, `checkKey`, `checkUserHash`, `getSets`, `getThemes`, `getSubthemes`, `getYears`, `getCollection`, `getAdditionalImages`, `getInstructions`, `getInstructionsBySetNumber`, `getReviews`, `getKeyUsageStats`, `getUserNotes`, `getUserFlagLabels`, `setUserFlagLabels`, `getUserMinifigNotes`, `getMinifigCollection`, `setMinifigCollection`, `setCollection`)
 - Safe defaults for caching
 - Middleware pipeline
 - Error sanitization to avoid leaking request secrets
@@ -32,6 +32,8 @@ const client = new BricksetApiClient({
 });
 
 const themes = await client.getThemes();
+await client.checkKey();
+await client.checkUserHash();
 const sets = await client.getSets({ theme: 'Technic', pageSize: 50 });
 const images = await client.getAdditionalImages(10276);
 const instructions = await client.getInstructions(10276);

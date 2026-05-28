@@ -240,6 +240,27 @@ export class BricksetApiClient {
     });
   }
 
+  async checkKey(
+    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string } = {},
+  ): Promise<EndpointType<'/api/v3.asmx/checkKey'>> {
+    const { apiKey, ...rest } = options;
+    return this.request('/api/v3.asmx/checkKey', {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+    });
+  }
+
+  async checkUserHash(
+    options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
+  ): Promise<EndpointType<'/api/v3.asmx/checkUserHash'>> {
+    const { apiKey, userHash, ...rest } = options;
+    return this.request('/api/v3.asmx/checkUserHash', {
+      ...rest,
+      apiKey: this.resolveApiKey(apiKey),
+      userHash: this.resolveUserHash(userHash),
+    });
+  }
+
   async getSets(
     params: GetSetsOptions,
     options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
