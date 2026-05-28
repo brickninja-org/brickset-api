@@ -55,6 +55,7 @@ const minifigs = await client.getMinifigCollection({ owned: 1 });
 - Set details: `getAdditionalImages`, `getInstructions`, `getInstructionsBySetNumber`, `getReviews`
 - User data: `getCollection`, `setCollection`, `getUserNotes`, `getUserFlagLabels`, `setUserFlagLabels`, `getUserMinifigNotes`, `getMinifigCollection`, `setMinifigCollection`
 - Usage: `getKeyUsageStats`
+- Full package matrix: [`docs/endpoint-coverage.md`](../../docs/endpoint-coverage.md)
 
 ## Extensibility
 

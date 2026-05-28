@@ -33,6 +33,7 @@ if (response.status === 'success') {
 - Query serialization for Brickset-compatible URL parameters
 - Optional request/response hooks
 - Typed error class (`BricksetApiError`) for non-2xx responses
+- Coverage matrix: [`docs/endpoint-coverage.md`](../../docs/endpoint-coverage.md)
 
 ## Security notes
 
