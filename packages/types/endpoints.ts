@@ -114,7 +114,18 @@ export type SetMinifigCollectionParams = {
   notes?: string;
 };
 
-export type SetUserFlagLabelsParams = Partial<Record<'1' | '2' | '3' | '4' | '5' | '6' | '7' | '8', string>>;
+type Max20Chars<S extends string> =
+  S extends `${infer A}${infer B}${infer C}${infer D}${infer E}${infer F}${infer G}${infer H}${infer I}${infer J}${infer K}${infer L}${infer M}${infer N}${infer O}${infer P}${infer Q}${infer R}${infer T}${infer U}${infer Rest}`
+    ? never
+    : S;
+
+export type FlagLabelValue = string & { readonly __max20Chars?: unique symbol };
+export type SetUserFlagLabelsParams =
+  Partial<Record<'1' | '2' | '3' | '4' | '5' | '6' | '7' | '8', FlagLabelValue>>;
+
+export function asFlagLabel<T extends string>(value: Max20Chars<T>): FlagLabelValue {
+  return value as FlagLabelValue;
+}
 
 // options
 type Options = {};

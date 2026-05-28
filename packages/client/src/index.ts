@@ -244,6 +244,7 @@ export class BricksetApiClient {
     params: GetSetsOptions,
     options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
   ): Promise<EndpointType<'/api/v3.asmx/getSets'>> {
+    validateGetSetsParams(params);
     const { apiKey, userHash, ...rest } = options;
     const resolvedUserHash = userHash ?? this.auth?.userHash;
 
@@ -380,6 +381,7 @@ export class BricksetApiClient {
     params: SetMinifigCollectionParams,
     options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
   ): Promise<EndpointType<'/api/v3.asmx/setMinifigCollection'>> {
+    validateSetMinifigCollectionParams(params);
     const { apiKey, userHash, ...rest } = options;
     return this.request('/api/v3.asmx/setMinifigCollection', {
       ...rest,
@@ -394,6 +396,7 @@ export class BricksetApiClient {
     params: SetUserFlagLabelsParams,
     options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
   ): Promise<EndpointType<'/api/v3.asmx/setUserFlagLabels'>> {
+    validateSetUserFlagLabelsParams(params);
     const { apiKey, userHash, ...rest } = options;
     return this.request('/api/v3.asmx/setUserFlagLabels', {
       ...rest,
@@ -444,6 +447,7 @@ export class BricksetApiClient {
     params: SetCollectionParams,
     options: FetchOptions & FetchBricksetApiOptions & { apiKey?: string; userHash?: string } = {},
   ): Promise<EndpointType<'/api/v3.asmx/setCollection'>> {
+    validateSetCollectionParams(params);
     const { apiKey, userHash, ...rest } = options;
     return this.request('/api/v3.asmx/setCollection', {
       ...rest,
@@ -574,4 +578,50 @@ function normalizeConcurrency(value: number | undefined): number {
     throw new Error('concurrency must be a positive integer.');
   }
   return value;
+}
+
+function validateGetSetsParams(params: GetSetsOptions): void {
+  if (params.pageSize !== undefined) {
+    assertIntegerInRange(params.pageSize, 1, 500, 'getSets params.pageSize');
+  }
+  if (params.pageNumber !== undefined) {
+    assertIntegerInRange(params.pageNumber, 1, Number.MAX_SAFE_INTEGER, 'getSets params.pageNumber');
+  }
+}
+
+function validateSetCollectionParams(params: SetCollectionParams): void {
+  validateOptionalQuantity(params.qtyOwned, 'setCollection params.qtyOwned');
+  validateOptionalQuantity(params.qtyWanted, 'setCollection params.qtyWanted');
+  validateOptionalQuantity(params.qtyOwnedNew, 'setCollection params.qtyOwnedNew');
+  validateOptionalQuantity(params.qtyOwnedUsed, 'setCollection params.qtyOwnedUsed');
+  if (params.rating !== undefined) {
+    assertIntegerInRange(params.rating, 1, 5, 'setCollection params.rating');
+  }
+}
+
+function validateSetMinifigCollectionParams(params: SetMinifigCollectionParams): void {
+  validateOptionalQuantity(params.qtyOwned, 'setMinifigCollection params.qtyOwned');
+}
+
+function validateSetUserFlagLabelsParams(params: SetUserFlagLabelsParams): void {
+  for (const key in params) {
+    if (!Object.prototype.hasOwnProperty.call(params, key)) continue;
+    const value = params[key as keyof SetUserFlagLabelsParams];
+    if (value !== undefined && String(value).length > 20) {
+      throw new Error(`setUserFlagLabels params.${key} must be 20 characters or fewer.`);
+    }
+  }
+}
+
+function validateOptionalQuantity(value: number | undefined, name: string): void {
+  if (value === undefined) {
+    return;
+  }
+  assertIntegerInRange(value, 0, 999, name);
+}
+
+function assertIntegerInRange(value: number, min: number, max: number, name: string): void {
+  if (!Number.isInteger(value) || value < min || value > max) {
+    throw new Error(`${name} must be an integer between ${min} and ${max}.`);
+  }
 }
