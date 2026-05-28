@@ -90,3 +90,12 @@ const client = new BricksetApiClient({
   ],
 });
 ```
+
+Batch requests with controlled concurrency:
+
+```ts
+const [themes, years] = await client.requestBatch([
+  { endpoint: '/api/v3.asmx/getThemes', options: { apiKey: process.env.BRICKSET_API_KEY! } },
+  { endpoint: '/api/v3.asmx/getYears', options: { apiKey: process.env.BRICKSET_API_KEY!, theme: 'Technic' } },
+] as const, { concurrency: 2 });
+```

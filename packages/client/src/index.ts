@@ -15,6 +15,12 @@ export type BricksetClientRequest<Url extends KnownEndpoint | (string & {})> = {
   options: BricksetClientRequestOptions<Url>;
 };
 
+export type BricksetBatchRequest = BricksetClientRequest<KnownEndpoint | (string & {})>;
+
+export type BricksetBatchResult<Requests extends readonly BricksetBatchRequest[]> = {
+  [K in keyof Requests]: Requests[K] extends BricksetClientRequest<infer Url> ? EndpointType<Url> : never;
+};
+
 export type BricksetClientRequestOptions<Url extends string> =
   FetchOptions &
   FetchBricksetApiOptions &
@@ -42,6 +48,10 @@ export type BricksetClientOptions = {
   defaultOptions?: Partial<FetchOptions & FetchBricksetApiOptions>;
   middlewares?: BricksetClientMiddleware[];
   cache?: BricksetClientCache;
+};
+
+export type RequestBatchOptions = {
+  concurrency?: number;
 };
 
 export interface BricksetClientCache {
@@ -189,6 +199,31 @@ export class BricksetApiClient {
     }
 
     return result;
+  }
+
+  async requestBatch<const Requests extends readonly BricksetBatchRequest[]>(
+    requests: Requests,
+    options: RequestBatchOptions = {},
+  ): Promise<BricksetBatchResult<Requests>> {
+    const concurrency = normalizeConcurrency(options.concurrency);
+    const results: unknown[] = new Array(requests.length);
+    let nextIndex = 0;
+
+    const worker = async () => {
+      for (;;) {
+        const index = nextIndex;
+        nextIndex += 1;
+        if (index >= requests.length) {
+          return;
+        }
+        const request = requests[index];
+        results[index] = await this.request(request.endpoint, request.options);
+      }
+    };
+
+    const workers = Array.from({ length: Math.min(concurrency, requests.length) }, () => worker());
+    await Promise.all(workers);
+    return results as BricksetBatchResult<Requests>;
   }
 
   async login(
@@ -529,4 +564,14 @@ function sanitizeClientError(error: unknown): BricksetClientError {
   }
 
   return new BricksetClientError('Brickset API request failed.');
+}
+
+function normalizeConcurrency(value: number | undefined): number {
+  if (value === undefined) {
+    return 4;
+  }
+  if (!Number.isInteger(value) || value < 1) {
+    throw new Error('concurrency must be a positive integer.');
+  }
+  return value;
 }
