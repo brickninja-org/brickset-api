@@ -29,11 +29,7 @@ export type GetSetsOrderBy = OrderByBase | `${OrderByBase}DESC`;
 
 export type GetSetsOptions = {
   setID?: number;
-  query?: {
-    setNumber?: string;
-    theme?: string;
-    subtheme?: string;
-  };
+  query?: string;
   theme?: string | string[];
   subtheme?: string | string[];
   setNumber?: string | string[];
