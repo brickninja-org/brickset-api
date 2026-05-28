@@ -1,5 +1,16 @@
 # @brickset-api/client
 
+## 0.1.2
+
+### Patch Changes
+
+- 79c647b: Add high-level client wrappers for Brickset auth validation:
+
+  - `checkKey()`
+  - `checkUserHash()`
+
+  Also updates the client README to document these methods.
+
 ## 0.1.1
 
 ### Patch Changes
