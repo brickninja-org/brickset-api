@@ -1,6 +1,6 @@
 {
   "name": "@brickset-api/client",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "High-level client for the Brickset API with middleware and caching primitives",
   "license": "MIT",
   "type": "module",

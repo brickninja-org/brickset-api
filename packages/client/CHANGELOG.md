@@ -1,5 +1,11 @@
 # @brickset-api/client
 
+## 0.1.4
+
+### Patch Changes
+
+- ae8bf50: Refactor client endpoint methods to reduce duplication, tighten sanitized error behavior, and strengthen integration validation.
+
 ## 0.1.3
 
 ### Patch Changes
