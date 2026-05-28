@@ -39,3 +39,10 @@ Legend:
 - `@brickset-api/fetch` intentionally stays low-level and endpoint-generic.
 - `@brickset-api/client` adds validation, sane defaults, sanitization, and middleware support.
 - Keep this file updated whenever new endpoints or method wrappers are added.
+
+## How To Update
+
+1. Add or modify endpoint types in `packages/types/endpoints.ts`.
+2. Update the table in this file to match the endpoint set exactly.
+3. Run `pnpm verify:coverage`.
+4. Run `pnpm test` before opening a PR.
