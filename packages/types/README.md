@@ -22,6 +22,7 @@ type GetSetsOptions = OptionsByEndpoint<'/api/v3.asmx/getSets?params={"query":"t
 - Endpoint contracts (`KnownEndpoint`, `OptionsByEndpoint`, `EndpointType`)
 - Shared API response wrappers (`success` and `error` variants)
 - Data models under `@brickset-api/types/data/*`
+- Coverage matrix: [`docs/endpoint-coverage.md`](../../docs/endpoint-coverage.md)
 
 ## Notes
 
