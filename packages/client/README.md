@@ -11,7 +11,7 @@ Built on:
 - Typed endpoint methods (`login`, `checkKey`, `checkUserHash`, `getSets`, `getThemes`, `getSubthemes`, `getYears`, `getCollection`, `getAdditionalImages`, `getInstructions`, `getInstructionsBySetNumber`, `getReviews`, `getKeyUsageStats`, `getUserNotes`, `getUserFlagLabels`, `setUserFlagLabels`, `getUserMinifigNotes`, `getMinifigCollection`, `setMinifigCollection`, `setCollection`)
 - Safe defaults for caching
 - Middleware pipeline
-- Error sanitization to avoid leaking request secrets
+- Error sanitization to avoid leaking request secrets or raw low-level error details
 
 ## Install
 
@@ -46,7 +46,15 @@ const minifigs = await client.getMinifigCollection({ owned: 1 });
 
 - Sensitive values are redacted when generating cache keys (`apiKey`, `userHash`, `username`, `password`)
 - Mutating/auth endpoints are not cached by default
-- Errors are sanitized by default (`sanitizeErrors: true`)
+- Errors are sanitized by default (`sanitizeErrors: true`) and do not expose internal causes by default
+
+## Endpoint coverage
+
+- Auth: `login`, `checkKey`, `checkUserHash`
+- Catalog: `getSets`, `getThemes`, `getSubthemes`, `getYears`
+- Set details: `getAdditionalImages`, `getInstructions`, `getInstructionsBySetNumber`, `getReviews`
+- User data: `getCollection`, `setCollection`, `getUserNotes`, `getUserFlagLabels`, `setUserFlagLabels`, `getUserMinifigNotes`, `getMinifigCollection`, `setMinifigCollection`
+- Usage: `getKeyUsageStats`
 
 ## Extensibility
 
