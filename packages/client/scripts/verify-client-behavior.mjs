@@ -17,6 +17,20 @@ globalThis.fetch = async (request) => {
     });
   }
 
+  if (url.pathname.endsWith('/login')) {
+    return new Response(JSON.stringify({ status: 'success', hash: 'hash-from-login' }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
+  if (url.pathname.endsWith('/getSets')) {
+    return new Response(JSON.stringify({ status: 'success', matches: 1, sets: [{ setID: 1, number: '1-1', name: 'Sample Set', year: 2024, theme: 'Test', themeGroup: 'Test', category: 'Normal', released: true, pieces: 10, minifigs: 0, image: { thumbnailURL: '', imageURL: '' }, bricksetURL: '', collection: { owned: false, wanted: false }, rating: 0, reviewCount: 0, packagingType: 'Box', availability: 'Retail', instructionsCount: 0, additionalImageCount: 0, ageRange: { min: 0, max: 99 }, dimensions: { height: 0, width: 0, depth: 0, weight: 0 }, barcode: {}, extendedData: {}, LEGOCom: {}, collections: {}, dateAdded: '2024-01-01', dateRemoved: '' }] }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
   if (url.pathname.endsWith('/getAdditionalImages')) {
     return new Response(JSON.stringify({ status: 'success', matches: 1, additionalImages: [{ thumbnailURL: 'https://example.com/t.jpg', imageURL: 'https://example.com/i.jpg' }] }), {
       status: 200,
@@ -24,8 +38,29 @@ globalThis.fetch = async (request) => {
     });
   }
 
+  if (url.pathname.endsWith('/getCollection')) {
+    return new Response(JSON.stringify({ status: 'success', matches: 1, sets: [{ setID: 10276, number: '10276-1', name: 'Colosseum', qtyOwned: 1, qtyWanted: 0, rating: 5, notes: '' }] }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
   if (url.pathname.endsWith('/getUserNotes')) {
     return new Response(JSON.stringify({ status: 'success', matches: 1, userNotes: [{ setID: 10276, notes: 'note' }] }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
+  if (url.pathname.endsWith('/getUserFlagLabels')) {
+    return new Response(JSON.stringify({ status: 'success', matches: 1, flags: [{ flagNumber: 1, label: 'Fav' }] }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
+  if (url.pathname.endsWith('/getUserMinifigNotes')) {
+    return new Response(JSON.stringify({ status: 'success', matches: 1, userMinifigNotes: [{ minifigNumber: 'fig-1', notes: 'nice fig' }] }), {
       status: 200,
       headers: { 'content-type': 'application/json' },
     });
@@ -45,9 +80,44 @@ globalThis.fetch = async (request) => {
     });
   }
 
+  if (url.pathname.endsWith('/getInstructions2')) {
+    return new Response(JSON.stringify({ status: 'success', matches: 1, instructions: [{ URL: 'https://example.com/2', description: 'PDF 2' }] }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
+  if (url.pathname.endsWith('/getReviews')) {
+    return new Response(JSON.stringify({ status: 'success', matches: 1, reviews: [{ author: 'Brickset', title: 'Great', datePosted: '2024-01-01' }] }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
+  if (url.pathname.endsWith('/getKeyUsageStats')) {
+    return new Response(JSON.stringify({ status: 'success', matches: 1, apiKeyUsage: [{ date: '2024-01-01', count: 1 }] }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
   if (url.pathname.endsWith('/setCollection')) {
     return new Response(JSON.stringify({ status: 'error', message: 'forced error' }), {
       status: 400,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
+  if (url.pathname.endsWith('/setUserFlagLabels')) {
+    return new Response(JSON.stringify({ status: 'success' }), {
+      status: 200,
+      headers: { 'content-type': 'application/json' },
+    });
+  }
+
+  if (url.pathname.endsWith('/setMinifigCollection')) {
+    return new Response(JSON.stringify({ status: 'success' }), {
+      status: 200,
       headers: { 'content-type': 'application/json' },
     });
   }
@@ -111,19 +181,43 @@ const client = new BricksetApiClient({
 
 await client.getThemes();
 await client.getThemes();
+await client.login('user', 'pass');
 await client.checkKey();
 await client.checkUserHash();
+await client.getSets({ query: 'technic', pageSize: 1, pageNumber: 1 });
+await client.getSubthemes('Technic');
+await client.getYears('Technic');
+await client.getCollection();
 await client.getAdditionalImages(10276);
 await client.getInstructions(10276);
+await client.getInstructionsBySetNumber('10276-1');
+await client.getReviews(10276);
+await client.getKeyUsageStats();
 await client.getUserNotes();
+await client.getUserFlagLabels();
+await client.getUserMinifigNotes();
 await client.getMinifigCollection({ owned: 1 });
+await client.setUserFlagLabels({ 1: 'Fav' });
+await client.setMinifigCollection('fig-1', { own: 1, qtyOwned: 1 });
 assert(calls.filter((c) => c.pathname.endsWith('/getThemes')).length === 1, 'getThemes should be cached by default');
 assert(calls.some((c) => c.pathname.endsWith('/getAdditionalImages') && c.searchParams.get('setID') === '10276'), 'getAdditionalImages should serialize setID');
 assert(calls.some((c) => c.pathname.endsWith('/getInstructions') && c.searchParams.get('setID') === '10276'), 'getInstructions should serialize setID');
 assert(calls.some((c) => c.pathname.endsWith('/getUserNotes') && c.searchParams.get('userHash') === 'h'), 'getUserNotes should include userHash');
+assert(calls.some((c) => c.pathname.endsWith('/login')), 'login should call endpoint');
 assert(calls.some((c) => c.pathname.endsWith('/checkKey')), 'checkKey should call the checkKey endpoint');
 assert(calls.some((c) => c.pathname.endsWith('/checkUserHash') && c.searchParams.get('userHash') === 'h'), 'checkUserHash should include userHash');
+assert(calls.some((c) => c.pathname.endsWith('/getSets') && c.searchParams.get('params')?.includes('"query":"technic"')), 'getSets should serialize params JSON');
+assert(calls.some((c) => c.pathname.endsWith('/getSubthemes') && c.searchParams.get('theme') === 'Technic'), 'getSubthemes should serialize theme');
+assert(calls.some((c) => c.pathname.endsWith('/getYears') && c.searchParams.get('theme') === 'Technic'), 'getYears should serialize optional theme');
+assert(calls.some((c) => c.pathname.endsWith('/getCollection') && c.searchParams.get('userHash') === 'h'), 'getCollection should include userHash');
+assert(calls.some((c) => c.pathname.endsWith('/getInstructions2') && c.searchParams.get('setNumber') === '10276-1'), 'getInstructionsBySetNumber should serialize setNumber');
+assert(calls.some((c) => c.pathname.endsWith('/getReviews') && c.searchParams.get('setID') === '10276'), 'getReviews should serialize setID');
+assert(calls.some((c) => c.pathname.endsWith('/getKeyUsageStats')), 'getKeyUsageStats should call endpoint');
+assert(calls.some((c) => c.pathname.endsWith('/getUserFlagLabels') && c.searchParams.get('userHash') === 'h'), 'getUserFlagLabels should include userHash');
+assert(calls.some((c) => c.pathname.endsWith('/getUserMinifigNotes') && c.searchParams.get('userHash') === 'h'), 'getUserMinifigNotes should include userHash');
 assert(calls.some((c) => c.pathname.endsWith('/getMinifigCollection') && c.searchParams.get('params')?.includes('\"owned\":1')), 'getMinifigCollection should serialize params JSON');
+assert(calls.some((c) => c.pathname.endsWith('/setUserFlagLabels') && c.searchParams.get('params')?.includes('"1":"Fav"')), 'setUserFlagLabels should serialize params JSON');
+assert(calls.some((c) => c.pathname.endsWith('/setMinifigCollection') && c.searchParams.get('minifigNumber') === 'fig-1'), 'setMinifigCollection should serialize minifigNumber');
 
 let sawSanitized = false;
 try {
