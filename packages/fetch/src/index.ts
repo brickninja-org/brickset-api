@@ -76,8 +76,9 @@ export async function fetchBricksetApi<
   // call onResponse handler
   await resolvedOptions.onResponse?.(response);
 
-  // check if the response is json (`application/json; charset=utf-8`)
-  const isJson = true; // response.headers.get('content-type').startsWith('application/json');
+  // only parse JSON when content-type indicates JSON
+  const contentType = response.headers.get('content-type') ?? '';
+  const isJson = contentType.toLowerCase().startsWith('application/json');
 
   // censor user hash in url to not leak it in error messages
   let erroredUrl = hasUserHash(resolvedOptions) && resolvedOptions.userHash !== ''
