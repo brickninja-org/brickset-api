@@ -1,5 +1,5 @@
 export type Years = {
   theme: string;
-  year: string;
+  year: number;
   setCount: number;
 };
