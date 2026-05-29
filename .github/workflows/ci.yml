@@ -58,7 +58,10 @@ jobs:
     name: Smoke / Live Brickset API
     runs-on: ubuntu-latest
     needs: [success]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.BRICKSET_API_KEY != ''
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    env:
+      BRICKSET_API_KEY: ${{ secrets.BRICKSET_API_KEY }}
+      BRICKSET_USER_HASH: ${{ secrets.BRICKSET_USER_HASH }}
     steps:
       - uses: actions/checkout@v6
       - name: Setup pnpm
@@ -71,23 +74,18 @@ jobs:
           node-version: 24
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
+      - name: Skip live smoke checks when secret is missing
+        if: env.BRICKSET_API_KEY == ''
+        run: echo "BRICKSET_API_KEY is not configured; skipping live smoke checks."
       - name: Run live smoke checks
-        env:
-          BRICKSET_API_KEY: ${{ secrets.BRICKSET_API_KEY }}
-          BRICKSET_USER_HASH: ${{ secrets.BRICKSET_USER_HASH }}
+        if: env.BRICKSET_API_KEY != ''
         run: pnpm smoke:live-api
 
   publish-npm:
     name: Publish / npm
     runs-on: ubuntu-latest
     needs: [success, smoke-live-api]
-    if: >
-      github.event_name == 'push' &&
-      github.ref == 'refs/heads/main' &&
-      (
-        needs.smoke-live-api.result == 'success' ||
-        needs.smoke-live-api.result == 'skipped'
-      )
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     permissions:
       contents: write
       id-token: write
