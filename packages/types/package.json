@@ -23,6 +23,12 @@
     "api",
     "typescript"
   ],
+  "files": [
+    "endpoints.ts",
+    "data",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "test": "tsc",
     "build": "tsc"

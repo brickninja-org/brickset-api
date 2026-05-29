@@ -18,6 +18,11 @@
     "api",
     "typescript"
   ],
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "test": "pnpm -C ../fetch build && tsc --noEmit",
     "build": "tsc",

@@ -17,6 +17,11 @@
     "brickset",
     "api"
   ],
+  "files": [
+    "dist",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "test": "tsc --noEmit",
     "build": "tsc",
