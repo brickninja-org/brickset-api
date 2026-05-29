@@ -1,7 +1,7 @@
 {
   "name": "@brickset-api/types",
   "version": "0.0.19",
-  "description": "TypeScript types for all datastructures used by the Brickset API",
+  "description": "TypeScript types for all data structures used by the Brickset API",
   "license": "MIT",
   "repository": {
     "type": "git",

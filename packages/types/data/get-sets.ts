@@ -1,3 +1,5 @@
+import type { Image } from './image';
+
 export type GetSets = GetSetsBase;
 
 type OrderByBase =
@@ -147,9 +149,4 @@ interface ItemNumbers {
 interface AgeRange {
   min?: number;
   max?: number;
-}
-
-interface Image {
-  thumbnailURL: string;
-  imageURL: string;
 }

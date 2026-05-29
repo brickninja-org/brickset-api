@@ -1,6 +1,6 @@
 export type GetThemes = GetThemesBase;
 
-export type GetThemesOptions = unknown;
+export type GetThemesOptions = Record<string, never>;
 
 export type GetThemesBase = {
   theme: string;
