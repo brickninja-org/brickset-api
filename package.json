@@ -10,6 +10,8 @@
     "verify:coverage": "node scripts/verify-endpoint-coverage.mjs",
     "verify:workspace-versions": "node scripts/verify-workspace-versions.mjs",
     "verify:pack": "node scripts/verify-publish-artifacts.mjs",
+    "verify:api-surface": "node scripts/verify-api-surface.mjs",
+    "verify:api-surface:update": "node scripts/verify-api-surface.mjs --update",
     "test:coverage-script": "node --test scripts/verify-endpoint-coverage.test.mjs",
     "release": "pnpm build && changeset publish"
   },
