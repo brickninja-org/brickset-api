@@ -5,7 +5,12 @@ const assert = (cond, msg) => {
 const calls = [];
 globalThis.fetch = async (request) => {
   const req = request instanceof Request ? request : new Request(request);
-  calls.push(new URL(req.url));
+  const url = new URL(req.url);
+  calls.push(url);
+
+  if (url.pathname.endsWith('/getThemes')) {
+    return new Response('not json', { status: 200, headers: { 'content-type': 'text/plain' } });
+  }
 
   return new Response(
     JSON.stringify({ status: 'success', matches: 0, sets: [] }),
@@ -13,7 +18,7 @@ globalThis.fetch = async (request) => {
   );
 };
 
-const { fetchBricksetApi } = await import('../dist/index.js');
+const { fetchBricksetApi, BricksetApiError } = await import('../dist/index.js');
 
 await fetchBricksetApi('/api/v3.asmx/getSets', {
   apiKey: 'test-key',
@@ -27,7 +32,17 @@ await fetchBricksetApi('/api/v3.asmx/setCollection', {
   params: { own: 1, qtyOwned: 2 },
 });
 
-assert(calls.length === 2, 'Expected 2 fetch calls');
+let rejectedNonJson = false;
+try {
+  await fetchBricksetApi('/api/v3.asmx/getThemes', { apiKey: 'test-key' });
+} catch (error) {
+  rejectedNonJson =
+    error instanceof BricksetApiError &&
+    String(error.message).includes('did not respond with a JSON response');
+}
+assert(rejectedNonJson, 'Expected non-JSON response to throw BricksetApiError');
+
+assert(calls.length === 3, 'Expected 3 fetch calls');
 
 const [getSetsUrl, setCollectionUrl] = calls;
 assert(getSetsUrl.pathname === '/api/v3.asmx/getSets', 'getSets path mismatch');
