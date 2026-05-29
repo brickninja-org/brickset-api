@@ -39,6 +39,7 @@ jobs:
     - run: pnpm install --frozen-lockfile
     - run: pnpm test:coverage-script
     - run: pnpm verify:coverage
+    - run: pnpm verify:workspace-versions
     - run: pnpm test
     - run: pnpm build
 
