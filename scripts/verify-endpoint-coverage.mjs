@@ -5,34 +5,71 @@ const ROOT = process.cwd();
 const ENDPOINTS_FILE = resolve(ROOT, 'packages/types/endpoints.ts');
 const COVERAGE_FILE = resolve(ROOT, 'docs/endpoint-coverage.md');
 
-const endpointsSource = readFileSync(ENDPOINTS_FILE, 'utf8');
-const coverageSource = readFileSync(COVERAGE_FILE, 'utf8');
+function main() {
+  const endpointsSource = readFileSync(ENDPOINTS_FILE, 'utf8');
+  const coverageSource = readFileSync(COVERAGE_FILE, 'utf8');
+  const result = verifyCoverage(endpointsSource, coverageSource);
 
-const knownFromTypes = extractKnownEndpoints(endpointsSource);
-const endpointsFromCoverage = extractCoverageEndpoints(coverageSource);
+  if (!result.ok) {
+    printFailures(result);
+    process.exit(1);
+  }
 
-const missingInCoverage = diff(knownFromTypes, endpointsFromCoverage);
-const unknownInCoverage = diff(endpointsFromCoverage, knownFromTypes);
-const duplicateCoverageEntries = findDuplicates(endpointsFromCoverage);
-
-if (missingInCoverage.length > 0 || unknownInCoverage.length > 0 || duplicateCoverageEntries.length > 0) {
-  console.error('Endpoint coverage verification failed.');
-  if (missingInCoverage.length > 0) {
-    console.error('\nMissing in docs/endpoint-coverage.md:');
-    for (const endpoint of missingInCoverage) console.error(`- ${endpoint}`);
-  }
-  if (unknownInCoverage.length > 0) {
-    console.error('\nUnknown endpoints in docs/endpoint-coverage.md:');
-    for (const endpoint of unknownInCoverage) console.error(`- ${endpoint}`);
-  }
-  if (duplicateCoverageEntries.length > 0) {
-    console.error('\nDuplicate endpoints in docs/endpoint-coverage.md:');
-    for (const endpoint of duplicateCoverageEntries) console.error(`- ${endpoint}`);
-  }
-  process.exit(1);
+  console.log(`Endpoint coverage verified (${result.knownEndpoints.length} endpoints).`);
 }
 
-console.log(`Endpoint coverage verified (${knownFromTypes.length} endpoints).`);
+export function verifyCoverage(endpointsSource, coverageSource) {
+  const knownEndpoints = extractKnownEndpoints(endpointsSource);
+  const coverageRows = extractCoverageRows(coverageSource);
+  const coverageEndpoints = coverageRows.map((row) => row.endpoint);
+
+  const missingInCoverage = diff(knownEndpoints, uniqueSorted(coverageEndpoints));
+  const unknownInCoverage = diff(uniqueSorted(coverageEndpoints), knownEndpoints);
+  const duplicateCoverageEntries = findDuplicates(coverageEndpoints);
+
+  const malformedCoverageRows = coverageSource
+    .split('\n')
+    .filter((line) => line.startsWith('| `/api/v3.asmx/') && !COVERAGE_ROW_REGEX.test(line));
+
+  const ok =
+    missingInCoverage.length === 0 &&
+    unknownInCoverage.length === 0 &&
+    duplicateCoverageEntries.length === 0 &&
+    malformedCoverageRows.length === 0;
+
+  return {
+    ok,
+    knownEndpoints,
+    coverageRows,
+    missingInCoverage,
+    unknownInCoverage,
+    duplicateCoverageEntries,
+    malformedCoverageRows,
+  };
+}
+
+function printFailures(result) {
+  console.error('Endpoint coverage verification failed.');
+  if (result.missingInCoverage.length > 0) {
+    console.error('\nMissing in docs/endpoint-coverage.md:');
+    for (const endpoint of result.missingInCoverage) console.error(`- ${endpoint}`);
+  }
+  if (result.unknownInCoverage.length > 0) {
+    console.error('\nUnknown endpoints in docs/endpoint-coverage.md:');
+    for (const endpoint of result.unknownInCoverage) console.error(`- ${endpoint}`);
+  }
+  if (result.duplicateCoverageEntries.length > 0) {
+    console.error('\nDuplicate endpoints in docs/endpoint-coverage.md:');
+    for (const endpoint of result.duplicateCoverageEntries) console.error(`- ${endpoint}`);
+  }
+  if (result.malformedCoverageRows.length > 0) {
+    console.error('\nMalformed coverage rows (expected: endpoint + yes/partial/no columns):');
+    for (const row of result.malformedCoverageRows) console.error(`- ${row}`);
+  }
+}
+
+const COVERAGE_ROW_REGEX =
+  /^\|\s*`(\/api\/v3\.asmx\/[^`]+)`\s*\|\s*(yes|partial|no)\s*\|\s*(yes|partial|no)\s*\|\s*(yes|partial|no)\s*\|$/;
 
 function extractKnownEndpoints(source) {
   const blocks = ['KnownAuthenticatedEndpoint', 'KnownUnauthorizedEndpoint']
@@ -48,24 +85,24 @@ function extractKnownEndpoints(source) {
 }
 
 function extractTypeBlock(source, typeName) {
-  const startToken = `export type ${typeName} =`;
-  const startIndex = source.indexOf(startToken);
-  if (startIndex === -1) return '';
-
-  const afterStart = source.slice(startIndex + startToken.length);
-  const semicolonIndex = afterStart.indexOf(';');
-  if (semicolonIndex === -1) return '';
-  return afterStart.slice(0, semicolonIndex);
+  const match = source.match(new RegExp(`export type ${typeName} =([\\s\\S]*?);`));
+  return match?.[1] ?? '';
 }
 
-function extractCoverageEndpoints(source) {
+function extractCoverageRows(source) {
   const rows = source.split('\n').filter((line) => line.startsWith('| `/api/v3.asmx/'));
-  const endpoints = rows.map((row) => {
-    const cells = row.split('|').map((cell) => cell.trim());
-    return cells[1]?.slice(1, -1);
-  }).filter(Boolean);
-
-  return uniqueSorted(endpoints);
+  return rows
+    .map((row) => {
+      const match = row.match(COVERAGE_ROW_REGEX);
+      if (!match) return null;
+      return {
+        endpoint: match[1],
+        types: match[2],
+        fetch: match[3],
+        client: match[4],
+      };
+    })
+    .filter(Boolean);
 }
 
 function findDuplicates(values) {
@@ -85,4 +122,8 @@ function diff(a, b) {
 
 function uniqueSorted(values) {
   return Array.from(new Set(values)).sort();
+}
+
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main();
 }

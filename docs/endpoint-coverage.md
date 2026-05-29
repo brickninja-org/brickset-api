@@ -44,5 +44,6 @@ Legend:
 
 1. Add or modify endpoint types in `packages/types/endpoints.ts`.
 2. Update the table in this file to match the endpoint set exactly.
-3. Run `pnpm verify:coverage`.
-4. Run `pnpm test` before opening a PR.
+3. Run `pnpm test:coverage-script`.
+4. Run `pnpm verify:coverage`.
+5. Run `pnpm test` before opening a PR.
