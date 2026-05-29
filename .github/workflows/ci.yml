@@ -54,11 +54,40 @@ jobs:
     - run: jq --exit-status 'all(.result == "success")' <<< '${{ toJson(needs) }}'
     - run: exit 0
 
+  smoke-live-api:
+    name: Smoke / Live Brickset API
+    runs-on: ubuntu-latest
+    needs: [success]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && secrets.BRICKSET_API_KEY != ''
+    steps:
+      - uses: actions/checkout@v6
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 11.4.0
+      - name: Use Node.js 24
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - name: Run live smoke checks
+        env:
+          BRICKSET_API_KEY: ${{ secrets.BRICKSET_API_KEY }}
+          BRICKSET_USER_HASH: ${{ secrets.BRICKSET_USER_HASH }}
+        run: pnpm smoke:live-api
+
   publish-npm:
     name: Publish / npm
     runs-on: ubuntu-latest
-    needs: [success]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [success, smoke-live-api]
+    if: >
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      (
+        needs.smoke-live-api.result == 'success' ||
+        needs.smoke-live-api.result == 'skipped'
+      )
     permissions:
       contents: write
       id-token: write
