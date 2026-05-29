@@ -40,6 +40,7 @@ jobs:
     - run: pnpm test:coverage-script
     - run: pnpm verify:coverage
     - run: pnpm verify:workspace-versions
+    - run: pnpm verify:pack
     - run: pnpm test
     - run: pnpm build
 
