@@ -26,7 +26,7 @@ jobs:
         node-version: [ 22, 24 ]
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Setup pnpm
       uses: pnpm/action-setup@v6
       with:
@@ -63,7 +63,7 @@ jobs:
       BRICKSET_API_KEY: ${{ secrets.BRICKSET_API_KEY }}
       BRICKSET_USER_HASH: ${{ secrets.BRICKSET_USER_HASH }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
         with:
@@ -92,7 +92,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v6
