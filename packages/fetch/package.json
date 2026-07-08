@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "@brickset-api/types": "workspace:*",
-    "typescript": "6.0.3"
+    "typescript": "7.0.2"
   },
   "peerDependencies": {
     "@brickset-api/types": "~0.0.19"
