@@ -26,13 +26,13 @@ jobs:
         node-version: [ 22, 24 ]
 
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v6.1.0
     - name: Setup pnpm
-      uses: pnpm/action-setup@v6
+      uses: pnpm/action-setup@v6.1.0
       with:
         version: 11.4.0
     - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v6
+      uses: actions/setup-node@v6.5.0
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'pnpm'
@@ -63,15 +63,15 @@ jobs:
       BRICKSET_API_KEY: ${{ secrets.BRICKSET_API_KEY }}
       BRICKSET_USER_HASH: ${{ secrets.BRICKSET_USER_HASH }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v6.1.0
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@v6.1.0
         with:
           version: 11.4.0
       - name: Use Node.js 24
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.5.0
         with:
-          node-version: 24
+          node-version: 24.21.0
           cache: 'pnpm'
       - run: pnpm install --frozen-lockfile
       - name: Skip live smoke checks when secret is missing
@@ -92,15 +92,15 @@ jobs:
       pull-requests: write
     steps:
       - name: Checkout Repo
-        uses: actions/checkout@v6
+        uses: actions/checkout@v6.1.0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@v6.1.0
         with:
           version: 11.4.0
 
       - name: Setup Node.js 22
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v6.5.0
         with:
           node-version: 24.16.0
           cache: 'pnpm'
